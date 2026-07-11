@@ -1,4 +1,4 @@
-/* reflexcheck.io — Reaction Time Test
+/* reflexdash.com — Reaction Time Test
    Pure vanilla JS, zero dependencies, zero build step. */
 
 /* ============================= pure stats / rating logic =============================
@@ -48,11 +48,11 @@ if (typeof module !== "undefined" && module.exports) {
   const ROUND_RESULT_DISPLAY_MS = 1100;
   const TOAST_DISPLAY_MS = 1800;
   const MAX_HISTORY = 10;
-  const SITE_URL = "https://reflexcheck.io/";
+  const SITE_URL = "https://reflexdash.com/";
 
-  const BEST_KEY = "reflexcheck_best_ms";
-  const HISTORY_KEY = "reflexcheck_history";
-  const THEME_KEY = "reflexcheck_theme";
+  const BEST_KEY = "reflexdash_best_ms";
+  const HISTORY_KEY = "reflexdash_history";
+  const THEME_KEY = "reflexdash_theme";
 
   /* ---------- theme toggle ---------- */
   (function initTheme() {
