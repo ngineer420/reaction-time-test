@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://reflexcheck.io/sitemap.xml
