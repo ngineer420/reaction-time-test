@@ -35,13 +35,12 @@
 </script>
 
 <!--
-  Ad monetization (Google AdSense placeholder)
+  Ad monetization (Google AdSense — Auto ads)
   ---------------------------------------------
   1. Get approved at https://adsense.google.com using this site's live URL.
   2. Replace ca-pub-XXXXXXXXXXXXXXXX below with your publisher ID.
-  3. Uncomment the <script> tag.
-  4. In assets/js/ads.js, replace the data-ad-slot values with your real ad unit slot IDs.
-  Until then, .ad-slot elements render as empty placeholders and do nothing.
+  3. Uncomment the <script> tag. Auto ads scans the live page and places
+     ad units automatically — no manual placement needed.
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 -->
@@ -67,8 +66,6 @@
     <p>How fast are your reflexes? Click the box the instant it turns green — 5 rounds, timed to the millisecond.</p>
     <p class="trust-line">Runs 100% in your browser<span class="dot">•</span>No sign-up<span class="dot">•</span>Free forever</p>
   </div>
-
-  <div class="ad-slot ad-slot--leaderboard" id="ad-top" aria-hidden="true"></div>
 
   <div class="stage-wrap">
     <div class="round-status">
@@ -141,8 +138,6 @@
     </table>
   </section>
 
-  <div class="ad-slot ad-slot--inline" id="ad-inline" aria-hidden="true"></div>
-
   <section class="container-narrow" style="padding-top:0;">
     <h2 style="margin-top:0;">About this reaction time test</h2>
     <p>ReflexZap is a free browser-based reaction time test. It measures the time between the moment a visual cue appears (the box turning green) and the moment you respond by clicking or tapping. This is called <strong>simple visual reaction time</strong> — one of the most common ways to measure how quickly your nervous system processes a stimulus and triggers a motor response.</p>
@@ -176,8 +171,6 @@
     </div>
   </section>
 </main>
-
-<div class="ad-slot ad-slot--footer" id="ad-footer" aria-hidden="true"></div>
 
 <footer class="site-footer">
   <div class="footer-inner">
