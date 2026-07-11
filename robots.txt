@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://reflexdash.com/sitemap.xml
+Sitemap: https://reflexzap.com/sitemap.xml

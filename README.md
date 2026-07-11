@@ -1,4 +1,4 @@
-# reflexdash.com
+# reflexzap.com
 
 A free, ad-supported reaction time test:
 
@@ -32,27 +32,27 @@ assets/css/styles.css   Design system
 assets/js/app.js        All app logic: timing state machine, stats/rating logic,
                           localStorage persistence, clipboard share, theme toggle
 assets/favicon.svg      Original lightning-bolt favicon
-CNAME                    GitHub Pages custom domain (reflexdash.com)
+CNAME                    GitHub Pages custom domain (reflexzap.com)
 robots.txt / sitemap.xml SEO basics
 ```
 
 ## Enabling ads (Google AdSense)
 
-1. Deploy the site and get it live at reflexdash.com (or the `github.io` URL until the domain is purchased).
+1. Deploy the site and get it live at reflexzap.com (or the `github.io` URL until the domain is purchased).
 2. Apply at https://adsense.google.com with the live URL. Approval requires a working privacy policy (already included) and some real content/traffic — it isn't instant.
 3. Once approved, uncomment the AdSense `<script>` tag in `index.html`'s `<head>` and replace `ca-pub-XXXXXXXXXXXXXXXX` with your publisher ID.
 4. Fill in real ad units in place of the `.ad-slot` placeholder `<div>`s (`#ad-top`, `#ad-inline`, `#ad-footer`) with your AdSense ad unit code.
 
-## Custom domain (reflexdash.com)
+## Custom domain (reflexzap.com)
 
-**The domain `reflexdash.com` has NOT been purchased yet.** It was only checked for apparent availability via DNS lookup at the time this site was built — it still needs to be registered through a domain registrar before any of the DNS steps below matter. Until it's purchased and DNS is configured, the site will only be reachable at its `github.io` URL (e.g. `https://ngineer420.github.io/reaction-time-test/`).
+**The domain `reflexzap.com` has NOT been purchased yet.** It was only checked for apparent availability via DNS lookup at the time this site was built — it still needs to be registered through a domain registrar before any of the DNS steps below matter. Until it's purchased and DNS is configured, the site will only be reachable at its `github.io` URL (e.g. `https://ngineer420.github.io/reaction-time-test/`).
 
 The `CNAME` file is included now, per convention, so it's ready to go the moment the domain is bought. Once purchased:
 
-- Apex domain (`reflexdash.com`): four `A` records to `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`.
+- Apex domain (`reflexzap.com`): four `A` records to `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`.
 - `www` subdomain (optional): `CNAME` record to `<username>.github.io`.
 
-Then enable Pages in the repo's Settings → Pages, and enter `reflexdash.com` as the custom domain (GitHub will offer to enforce HTTPS once DNS propagates).
+Then enable Pages in the repo's Settings → Pages, and enter `reflexzap.com` as the custom domain (GitHub will offer to enforce HTTPS once DNS propagates).
 
 ## Reaction time rating thresholds
 
