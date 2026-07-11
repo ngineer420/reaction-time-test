@@ -77,6 +77,8 @@
     </div>
 
     <div class="test-stage state-idle" id="test-stage" role="button" tabindex="0" aria-live="polite" aria-label="Reaction time test area">
+      <div class="stage-round-pill" id="stage-round-pill" aria-hidden="true">Round 1 of 5</div>
+      <button type="button" id="stage-cancel-btn" class="stage-cancel" aria-label="Cancel test">✕</button>
       <div id="stage-content">
         <p class="stage-title">Ready to test your reflexes?</p>
         <p class="stage-sub">Click Start, then click the box the instant it turns green.</p>
@@ -88,12 +90,19 @@
     </div>
   </div>
 
-  <section class="panel" id="results-panel" hidden style="max-width:640px;margin:24px auto 0;">
+  <section class="panel panel-narrow" id="results-panel" hidden>
     <h2>Your results</h2>
     <div class="rating-banner">
       <div class="rating-label" id="rating-label"></div>
       <div class="rating-note" id="rating-note"></div>
+      <div class="rating-percentile" id="rating-percentile"></div>
     </div>
+
+    <div class="chart-card">
+      <div class="chart-card-title">Your 5 rounds</div>
+      <div id="rounds-chart"></div>
+    </div>
+
     <div class="results-grid">
       <div class="stat-tile highlight">
         <div class="stat-label">Average</div>
@@ -108,20 +117,24 @@
         <div class="stat-value" id="result-alltime-best">—</div>
       </div>
     </div>
-    <table class="rounds-table">
+
+    <table class="rounds-table visually-hidden">
+      <caption class="visually-hidden">Exact time for each round</caption>
       <thead><tr><th>Round</th><th class="num">Time</th></tr></thead>
       <tbody id="rounds-tbody"></tbody>
     </table>
+
     <div class="btn-row">
       <button type="button" id="retry-btn" class="primary">Test again</button>
       <button type="button" id="copy-btn" class="icon-btn">Copy result</button>
     </div>
-    <p class="disclaimer">This is a fun, approximate browser-based test — not a scientific or medical instrument. Your measured time includes your device's screen refresh rate, input latency, and browser/OS rendering delay, which can add roughly 20–80ms of noise on top of your true reaction time. Use it to track your own trend over time, not as an exact clinical measurement.</p>
+    <p class="disclaimer">This is a fun, approximate browser-based test — not a scientific or medical instrument. Your measured time includes your device's screen refresh rate, input latency, and browser/OS rendering delay, which can add roughly 20–80ms of noise on top of your true reaction time. The percentile comparison above is a rough, illustrative estimate for fun — not a scientific ranking. Use it to track your own trend over time, not as an exact clinical measurement.</p>
   </section>
 
-  <section class="panel" id="history-panel" style="max-width:640px;margin:24px auto 0;">
+  <section class="panel panel-narrow" id="history-panel">
     <h2>Your history</h2>
     <div id="history-empty" class="disclaimer" style="margin-top:0;">No test sessions yet — run a test above to start tracking your history.</div>
+    <div id="history-sparkline" class="sparkline-wrap" hidden></div>
     <table class="rounds-table" id="history-table" hidden>
       <thead><tr><th>Date</th><th class="num">Average</th></tr></thead>
       <tbody id="history-tbody"></tbody>
@@ -148,8 +161,8 @@
     </div>
 
     <div class="faq-item">
-      <h3>Why did it say "Too soon"?</h3>
-      <p>If you click before the box turns green, that means you jumped the gun — the round doesn't count, and the same round restarts with a fresh random delay. This keeps the test measuring genuine reaction to the stimulus rather than a guessed or timed click.</p>
+      <h3>What happens if I click too soon?</h3>
+      <p>If you click before the box turns green, you'll see a brief "Not yet!" flash — that means you jumped the gun. The round doesn't count against you; it simply restarts with a fresh random delay. This keeps the test measuring genuine reaction to the stimulus rather than a guessed or timed click.</p>
     </div>
 
     <div class="faq-item">
