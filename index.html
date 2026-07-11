@@ -6,7 +6,7 @@
 <title>Reaction Time Test - How Fast Are Your Reflexes?</title>
 <meta name="description" content="Free online reaction time test. Click the box the instant it turns green and see your reaction speed in milliseconds over 5 rounds. Track your personal best — instant, no sign-up, runs entirely in your browser.">
 <link rel="canonical" href="https://reflexzap.com/">
-<meta name="theme-color" content="#0a0e14">
+<meta name="theme-color" content="#05070b">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Reaction Time Test - How Fast Are Your Reflexes?">
@@ -56,6 +56,11 @@
       <span class="brand-tag">reaction time test</span>
     </a>
     <div class="header-actions">
+      <button id="status-chip" class="status-chip" type="button" title="View your rank, streak &amp; achievements">
+        <span class="chip-level" id="chip-level">LV 1</span>
+        <span class="chip-streak is-zero" id="chip-streak">🔥0</span>
+      </button>
+      <button id="sound-toggle" class="icon-btn" type="button" aria-label="Toggle sound effects" title="Toggle sound">🔊</button>
       <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle dark/light theme" title="Toggle theme">◐</button>
     </div>
   </div>
@@ -66,6 +71,10 @@
     <h1>Reaction Time Test</h1>
     <p>How fast are your reflexes? Click the box the instant it turns green — 5 rounds, timed to the millisecond.</p>
     <p class="trust-line">Runs 100% in your browser<span class="dot">•</span>No sign-up<span class="dot">•</span>Free forever</p>
+    <div class="xp-bar-wrap">
+      <div class="xp-bar-label"><span class="xp-rank" id="xp-rank-label">Rookie Reflex</span><span id="xp-progress-label">0 / 100 XP</span></div>
+      <div class="xp-bar-track"><div class="xp-bar-fill" id="xp-bar-fill"></div></div>
+    </div>
   </div>
 
   <div class="ad-slot ad-slot--leaderboard" id="ad-top" aria-hidden="true"></div>
@@ -141,6 +150,11 @@
     </table>
   </section>
 
+  <section class="panel panel-narrow" id="achievements-panel">
+    <h2>Achievements</h2>
+    <div class="achievements-grid" id="achievements-grid"></div>
+  </section>
+
   <div class="ad-slot ad-slot--inline" id="ad-inline" aria-hidden="true"></div>
 
   <section class="container-narrow" style="padding-top:0;">
@@ -190,6 +204,7 @@
 </footer>
 
 <div class="toast" id="toast">Copied!</div>
+<div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
 
 <script src="/assets/js/app.js"></script>
 </body>

@@ -127,6 +127,268 @@ if (typeof module !== "undefined" && module.exports) {
     try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) { /* ignore */ }
   }
 
+  /* ============================= gamification ============================= */
+
+  const PROFILE_KEY = "reflexzap_profile";
+  const SOUND_KEY = "reflexzap_sound_muted";
+
+  const RANK_TITLES = [
+    { level: 1, title: "Rookie Reflex" },
+    { level: 2, title: "Quick Draw" },
+    { level: 3, title: "Sharp Shooter" },
+    { level: 4, title: "Fast Twitch" },
+    { level: 5, title: "Speed Demon" },
+    { level: 6, title: "Lightning Reflex" },
+    { level: 7, title: "Reflex Machine" },
+    { level: 8, title: "Neural Overclock" },
+    { level: 9, title: "Reflex Legend" },
+    { level: 10, title: "Reflex God" },
+  ];
+
+  // Cumulative XP required to *reach* a given level (triangular growth curve).
+  function xpForLevel(level) {
+    return 50 * level * (level - 1);
+  }
+
+  function levelForXp(xp) {
+    let level = 1;
+    while (xp >= xpForLevel(level + 1)) level += 1;
+    return Math.min(level, RANK_TITLES.length);
+  }
+
+  function titleForLevel(level) {
+    const entry = RANK_TITLES[Math.min(level, RANK_TITLES.length) - 1];
+    return entry ? entry.title : RANK_TITLES[RANK_TITLES.length - 1].title;
+  }
+
+  const ACHIEVEMENTS = [
+    { id: "first_zap", icon: "🎯", title: "First Zap", desc: "Complete your first test.", check: (c) => c.totalSessions >= 1 },
+    { id: "sub_300", icon: "🥉", title: "Sub-300 Club", desc: "Average under 300ms.", check: (c) => c.avg < 300 },
+    { id: "sub_250", icon: "🥈", title: "Sub-250 Club", desc: "Average under 250ms.", check: (c) => c.avg < 250 },
+    { id: "sub_200", icon: "🥇", title: "Sub-200 Club", desc: "Average under 200ms.", check: (c) => c.avg < 200 },
+    { id: "zero_jump", icon: "💎", title: "Zero Jump", desc: "Finish a session with no early clicks.", check: (c) => c.flawless },
+    { id: "pb_breaker", icon: "🏆", title: "Record Breaker", desc: "Beat your personal best 5 times.", check: (c) => c.pbBeatenCount >= 5 },
+    { id: "streak_3", icon: "🔥", title: "3-Day Streak", desc: "Play 3 days in a row.", check: (c) => c.streak >= 3 },
+    { id: "streak_7", icon: "🔥", title: "Week Warrior", desc: "Play 7 days in a row.", check: (c) => c.streak >= 7 },
+    { id: "streak_30", icon: "🔥", title: "Monthly Grind", desc: "Play 30 days in a row.", check: (c) => c.streak >= 30 },
+    { id: "sessions_10", icon: "🕹️", title: "Arcade Regular", desc: "Complete 10 test sessions.", check: (c) => c.totalSessions >= 10 },
+    { id: "sessions_50", icon: "🕹️", title: "Arcade Veteran", desc: "Complete 50 test sessions.", check: (c) => c.totalSessions >= 50 },
+    { id: "night_owl", icon: "🦉", title: "Night Owl", desc: "Complete a test between midnight and 5am.", check: (c) => c.hour >= 0 && c.hour < 5 },
+    { id: "level_5", icon: "⭐", title: "Rising Star", desc: "Reach level 5.", check: (c) => c.level >= 5 },
+    { id: "level_10", icon: "👑", title: "Reflex God", desc: "Reach the max level.", check: (c) => c.level >= 10 },
+  ];
+
+  function loadProfile() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(PROFILE_KEY));
+      if (raw && typeof raw === "object") {
+        return Object.assign(
+          { totalXP: 0, totalSessions: 0, pbBeatenCount: 0, streak: 0, lastPlayedDate: null, achievements: [] },
+          raw
+        );
+      }
+    } catch (e) { /* ignore */ }
+    return { totalXP: 0, totalSessions: 0, pbBeatenCount: 0, streak: 0, lastPlayedDate: null, achievements: [] };
+  }
+
+  function saveProfile(profile) {
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch (e) { /* ignore */ }
+  }
+
+  function dateKey(d) {
+    return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  }
+
+  function updateStreak(profile, now) {
+    const today = dateKey(now);
+    if (profile.lastPlayedDate === today) return profile.streak;
+    const yesterday = dateKey(new Date(now.getTime() - 86400000));
+    profile.streak = profile.lastPlayedDate === yesterday ? profile.streak + 1 : 1;
+    profile.lastPlayedDate = today;
+    return profile.streak;
+  }
+
+  function xpForSession(rating, isNewBest, isFirstBest, flawless) {
+    let xp = 20;
+    if (rating === "Superhuman") xp += 40;
+    else if (rating === "Excellent") xp += 25;
+    else if (rating === "Above Average") xp += 15;
+    else if (rating === "Average") xp += 8;
+    else xp += 5;
+    if (isNewBest && !isFirstBest) xp += 30;
+    if (flawless) xp += 10;
+    return xp;
+  }
+
+  // Records a completed session against the persisted profile: awards XP,
+  // advances the daily streak, and unlocks any newly-earned achievements.
+  // Returns everything the UI layer needs to render + celebrate the update.
+  function recordSession({ avg, isNewBest, isFirstBest, flawless, now }) {
+    const profile = loadProfile();
+    const prevLevel = levelForXp(profile.totalXP);
+
+    profile.totalSessions += 1;
+    if (isNewBest && !isFirstBest) profile.pbBeatenCount += 1;
+    const streak = updateStreak(profile, now);
+    const gained = xpForSession(getRatingLabel(avg), isNewBest, isFirstBest, flawless);
+    profile.totalXP += gained;
+    const newLevel = levelForXp(profile.totalXP);
+
+    const ctx = {
+      avg,
+      totalSessions: profile.totalSessions,
+      pbBeatenCount: profile.pbBeatenCount,
+      streak,
+      flawless,
+      level: newLevel,
+      hour: now.getHours(),
+    };
+    const newlyUnlocked = [];
+    ACHIEVEMENTS.forEach((a) => {
+      if (profile.achievements.indexOf(a.id) === -1 && a.check(ctx)) {
+        profile.achievements.push(a.id);
+        newlyUnlocked.push(a);
+      }
+    });
+
+    saveProfile(profile);
+    return {
+      profile,
+      xpGained: gained,
+      leveledUp: newLevel > prevLevel,
+      newLevel,
+      newlyUnlocked,
+    };
+  }
+
+  /* ---------- gamification rendering ---------- */
+
+  const chipLevel = document.getElementById("chip-level");
+  const chipStreak = document.getElementById("chip-streak");
+  const xpRankLabel = document.getElementById("xp-rank-label");
+  const xpProgressLabel = document.getElementById("xp-progress-label");
+  const xpBarFill = document.getElementById("xp-bar-fill");
+  const achievementsGrid = document.getElementById("achievements-grid");
+  const unlockStack = document.getElementById("unlock-stack");
+
+  function renderStatusChips(profile) {
+    const level = levelForXp(profile.totalXP);
+    if (chipLevel) chipLevel.textContent = "LV " + level;
+    if (chipStreak) {
+      chipStreak.textContent = "🔥" + profile.streak;
+      chipStreak.classList.toggle("is-zero", profile.streak === 0);
+    }
+    if (xpRankLabel) xpRankLabel.textContent = titleForLevel(level);
+    if (xpProgressLabel && xpBarFill) {
+      const base = xpForLevel(level);
+      const next = xpForLevel(level + 1);
+      const span = next - base || 1;
+      const into = Math.max(0, profile.totalXP - base);
+      const pct = level >= RANK_TITLES.length ? 100 : Math.min(100, (into / span) * 100);
+      xpProgressLabel.textContent =
+        level >= RANK_TITLES.length ? "MAX LEVEL" : into + " / " + span + " XP";
+      xpBarFill.style.width = pct + "%";
+    }
+  }
+
+  function renderAchievements(profile) {
+    if (!achievementsGrid) return;
+    achievementsGrid.innerHTML = ACHIEVEMENTS.map((a) => {
+      const unlocked = profile.achievements.indexOf(a.id) !== -1;
+      return (
+        `<div class="badge${unlocked ? " unlocked" : ""}" title="${a.title}: ${a.desc}">` +
+        `<span class="badge-icon" aria-hidden="true">${a.icon}</span>` +
+        `<span class="badge-title">${a.title}</span>` +
+        `</div>`
+      );
+    }).join("");
+  }
+
+  function queueUnlockToasts(items, kickerFor) {
+    if (!unlockStack || !items.length) return;
+    items.forEach((item, i) => {
+      setTimeout(() => {
+        const el = document.createElement("div");
+        el.className = "unlock-toast";
+        el.innerHTML =
+          `<span class="unlock-icon" aria-hidden="true">${item.icon}</span>` +
+          `<span class="unlock-text"><span class="unlock-kicker">${kickerFor(item)}</span>` +
+          `<span class="unlock-title">${item.title}</span></span>`;
+        unlockStack.appendChild(el);
+        playAchievementChime();
+        setTimeout(() => el.remove(), 3600);
+      }, i * 550);
+    });
+  }
+
+  /* ---------- arcade sound synth (WebAudio, no audio files) ---------- */
+
+  let audioCtx = null;
+  let soundMuted = false;
+  try { soundMuted = localStorage.getItem(SOUND_KEY) === "1"; } catch (e) { /* ignore */ }
+
+  function getAudioCtx() {
+    if (audioCtx) return audioCtx;
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    audioCtx = new Ctx();
+    return audioCtx;
+  }
+
+  function playTone(freq, startOffset, duration, type, peakGain) {
+    if (soundMuted) return;
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.value = freq;
+    const t0 = ctx.currentTime + startOffset;
+    gain.gain.setValueAtTime(0, t0);
+    gain.gain.linearRampToValueAtTime(peakGain || 0.08, t0 + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + duration + 0.02);
+  }
+
+  function playClickBlip() { playTone(880, 0, 0.09, "sine", 0.06); }
+  function playTooSoonBuzz() { playTone(140, 0, 0.18, "square", 0.05); }
+  function playAchievementChime() {
+    [660, 880, 1320].forEach((f, i) => playTone(f, i * 0.09, 0.16, "triangle", 0.07));
+  }
+  function playLevelUpFanfare() {
+    [523, 659, 784, 1046, 1318].forEach((f, i) => playTone(f, i * 0.08, 0.22, "square", 0.06));
+  }
+  function playNewBestSparkle() {
+    [988, 1318, 1568, 2093].forEach((f, i) => playTone(f, i * 0.06, 0.14, "sine", 0.07));
+  }
+
+  const soundToggleBtn = document.getElementById("sound-toggle");
+  function renderSoundToggle() {
+    if (!soundToggleBtn) return;
+    soundToggleBtn.textContent = soundMuted ? "🔇" : "🔊";
+  }
+  if (soundToggleBtn) {
+    soundToggleBtn.addEventListener("click", () => {
+      soundMuted = !soundMuted;
+      try { localStorage.setItem(SOUND_KEY, soundMuted ? "1" : "0"); } catch (e) { /* ignore */ }
+      renderSoundToggle();
+      if (!soundMuted) playClickBlip();
+    });
+    renderSoundToggle();
+  }
+
+  const statusChipBtn = document.getElementById("status-chip");
+  if (statusChipBtn) {
+    statusChipBtn.addEventListener("click", () => {
+      const panel = document.getElementById("achievements-panel");
+      if (panel) panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
   /* ---------- DOM refs ---------- */
   const stageEl = document.getElementById("test-stage");
   const stageContent = document.getElementById("stage-content");
@@ -171,6 +433,7 @@ if (typeof module !== "undefined" && module.exports) {
   let waitTimeoutId = null;
   let advanceTimeoutId = null;
   let toastTimeoutId = null;
+  let earlyClickCount = 0;
 
   function randomDelay() {
     return MIN_DELAY_MS + Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS);
@@ -233,6 +496,7 @@ if (typeof module !== "undefined" && module.exports) {
     clearTimers();
     currentRound = 0;
     roundTimes = [];
+    earlyClickCount = 0;
     resultsPanel.hidden = true;
     stageControls.hidden = true;
     enterFullBleed();
@@ -259,9 +523,11 @@ if (typeof module !== "undefined" && module.exports) {
 
   function handleTooSoon() {
     clearTimers();
+    earlyClickCount += 1;
     state = "toosoon";
     setStageState("state-toosoon");
     triggerShake(stageEl);
+    playTooSoonBuzz();
     setStageContentHTML(
       '<p class="stage-title">Not yet!</p>' +
       '<p class="stage-sub">You clicked before it turned green — wait for it next time.</p>'
@@ -276,6 +542,7 @@ if (typeof module !== "undefined" && module.exports) {
     const rawElapsed = performance.now() - greenAt;
     const elapsed = Math.max(0, Math.round(Number.isFinite(rawElapsed) ? rawElapsed : 0));
     roundTimes.push(elapsed);
+    playClickBlip();
 
     state = "round-result";
     setStageState("state-result");
@@ -331,8 +598,9 @@ if (typeof module !== "undefined" && module.exports) {
       const best = computeBest(roundTimes);
 
       const prevBest = loadBest();
-      const newAllTimeBest = prevBest === null || best < prevBest ? best : prevBest;
-      if (newAllTimeBest !== prevBest) saveBest(newAllTimeBest);
+      const isNewBest = prevBest === null || best < prevBest;
+      const newAllTimeBest = isNewBest ? best : prevBest;
+      if (isNewBest) saveBest(newAllTimeBest);
       renderBestChip();
 
       const history = loadHistory();
@@ -342,6 +610,28 @@ if (typeof module !== "undefined" && module.exports) {
 
       renderResults(avg, best, newAllTimeBest);
       renderHistory(trimmed);
+
+      const gameResult = recordSession({
+        avg,
+        isNewBest,
+        isFirstBest: prevBest === null,
+        flawless: earlyClickCount === 0,
+        now: new Date(),
+      });
+      renderStatusChips(gameResult.profile);
+      renderAchievements(gameResult.profile);
+
+      if (isNewBest && prevBest !== null) {
+        const avgTile = document.getElementById("result-avg");
+        if (avgTile) avgTile.closest(".stat-tile").classList.add("new-record");
+        playNewBestSparkle();
+      }
+      if (gameResult.leveledUp) {
+        setTimeout(playLevelUpFanfare, gameResult.newlyUnlocked.length ? 700 : 0);
+      }
+      queueUnlockToasts(gameResult.newlyUnlocked, () =>
+        gameResult.leveledUp ? "Achievement Unlocked · LV " + gameResult.newLevel : "Achievement Unlocked"
+      );
 
       resultsPanel.hidden = false;
       resultsPanel.classList.remove("panel-enter");
@@ -492,7 +782,9 @@ if (typeof module !== "undefined" && module.exports) {
   function copyResult() {
     const avg = computeAverage(roundTimes);
     if (!Number.isFinite(avg)) return;
-    const text = `My average reaction time is ${avg}ms on Reaction Time Test! Try to beat me: ${SITE_URL}`;
+    const profile = loadProfile();
+    const rank = titleForLevel(levelForXp(profile.totalXP));
+    const text = `My average reaction time is ${avg}ms on Reaction Time Test (${rank}, LV ${levelForXp(profile.totalXP)})! Try to beat me: ${SITE_URL}`;
 
     function fallbackCopy() {
       const ta = document.createElement("textarea");
@@ -549,4 +841,6 @@ if (typeof module !== "undefined" && module.exports) {
   /* ---------- init ---------- */
   renderBestChip();
   renderHistory(loadHistory());
+  renderStatusChips(loadProfile());
+  renderAchievements(loadProfile());
 })();
