@@ -1,0 +1,39 @@
+<article class="prose">
+  <h1>Project: reflexzap.com</h1>
+
+  A free reaction time test that measures how fast you react to a visual cue
+
+  <h2>Stack</h2>
+
+  <ul>
+    <li>- HTML/CSS/JS: Vanilla, no framework or build step</li>
+    <li>- DevOps: Static files on GitHub Pages, custom domain via Cloudflare DNS</li>
+  </ul>
+
+  <h2>Objective</h2>
+
+  To give players a fast, no-friction way to measure visual reaction time
+  across 5 scored rounds, using the browser's high-resolution timer, with a
+  results summary, a rating label, and history/personal best that persist
+  across visits.
+
+  <h2>Benefits</h2>
+
+  <ul>
+    <li>- Runs entirely client-side; no reaction data is ever uploaded</li>
+    <li>- Personal best and session history are stored only in the browser via localStorage</li>
+    <li>- A single pointerdown listener means desktop and mobile behave identically</li>
+    <li>- No backend or database, so the whole site is free to host</li>
+  </ul>
+
+  <h2>Drawbacks</h2>
+
+  <ul>
+    <li>- No account or cross-device sync — history and personal best live only in one browser</li>
+  </ul>
+
+  <h2>Easter Eggs</h2>
+
+  A tiny rabbit sits tucked into the very bottom-right corner of the page,
+  a nod to eRabb.it (erabb.it) — the site this one was built alongside.
+</article>
