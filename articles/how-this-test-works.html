@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How ReflexZap Works (and What a Browser Can't Measure) — reflexzap.com</title>
+<meta name="description" content="A look under the hood of our reaction time test: high-resolution browser timers, random delays, display and input latency, and why we built ReflexZap the way we did.">
+<link rel="canonical" href="https://reflexzap.com/articles/how-this-test-works.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/styles.css">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7560786263587509" crossorigin="anonymous"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="reflexzap.com home">
+      <span class="brand-mark"><span class="bolt">⚡</span>ReflexZap</span>
+    </a>
+  </div>
+</header>
+<main class="container-narrow">
+  <h1>How ReflexZap Works (and What a Browser Can't Measure)</h1>
+  <p>ReflexZap looks simple — a box turns green, you click it — and the core of it is. But measuring human reactions inside a web browser involves some genuinely interesting engineering constraints, and we think users deserve a straight explanation of what the number on screen does and doesn't mean. This article walks through <a href="/">the test</a> from the inside.</p>
+
+  <h2>The anatomy of one round</h2>
+  <p>When you start a round, the page picks a random delay between two and five seconds. Randomness is essential: if the delay were fixed, you would quickly learn the rhythm and start timing your click rather than reacting, and the test would measure prediction instead of reaction. Two to five seconds is long enough to be unpredictable but short enough that your attention doesn't drift.</p>
+  <p>When the delay expires, the box turns green and we record a timestamp. When your click or tap arrives, we record a second timestamp. The difference is your reaction time for the round. We run five rounds and report both your average and your best single round — the average because any single reaction time is noisy (attention fluctuates moment to moment), and the best round because it's satisfying, even though it's the less statistically meaningful of the two numbers.</p>
+  <p>If you click before the box turns green, the round doesn't count and simply restarts with a fresh random delay. Anticipatory clicks are the biggest source of fake-fast scores on reaction tests, so a false start can't be allowed to succeed even occasionally — otherwise the optimal strategy becomes gambling rather than reacting.</p>
+
+  <h2>Timing in JavaScript: better than you'd think</h2>
+  <p>Browsers expose a high-resolution clock, <code>performance.now()</code>, designed exactly for this kind of measurement. Unlike the ordinary date clock, it's monotonic — it never jumps backward or gets adjusted — and it offers sub-millisecond resolution. Modern browsers deliberately coarsen it slightly (to somewhere between 5 microseconds and a tenth of a millisecond or so, more in some privacy modes) to blunt timing-based security attacks, but that's far below the precision that matters for a human test where the signal is hundreds of milliseconds.</p>
+  <p>Event timestamps are attached to your click by the browser when the input is processed, and the whole measurement happens in your own device's memory. Nothing is sent to a server — there's no round trip to corrupt the timing, and your results stay in your browser's local storage.</p>
+
+  <h2>What we can't control: the latency sandwich</h2>
+  <p>Here's the honest part. Your measured time isn't purely biological reaction time; it's your reaction time sandwiched between two slices of hardware latency that a web page can neither eliminate nor precisely measure.</p>
+  <p><strong>Display latency (before you see anything).</strong> When our code changes the box to green, the browser still has to style, composite, and hand the frame to your screen — and your screen only refreshes at fixed intervals. On a 60&nbsp;Hz display, a new frame arrives every 16.7&nbsp;ms, so the green appears anywhere from 0 to 16.7&nbsp;ms after the timestamp we recorded, plus a few milliseconds of the panel physically changing its pixels. On average that's around 8–12&nbsp;ms of invisible head start the clock gets on you — less on a 120 or 144&nbsp;Hz screen.</p>
+  <p><strong>Input latency (after you decide to click).</strong> Your mouse reports its state at a polling interval (8&nbsp;ms at a typical 125&nbsp;Hz, 1&nbsp;ms on gaming mice), touchscreens scan at their own rate and often add tens of milliseconds, and the operating system and browser each take a moment to deliver the event. Bluetooth peripherals add more.</p>
+  <p>Stack it up and a browser test typically reads 20–80&nbsp;ms higher than what a laboratory would measure with a photodiode and a dedicated response box. This is why large online datasets show median results around 270&nbsp;ms while the psychology literature puts simple visual reaction time closer to 200–250&nbsp;ms: the extra milliseconds are mostly silicon, not neurons.</p>
+
+  <h2>Why the test is still useful</h2>
+  <p>The saving grace is that your hardware latency is roughly constant. Test on the same device and browser, and today's 265&nbsp;ms is directly comparable with last week's 280&nbsp;ms — the sandwich is the same thickness both times; only you changed. That makes a browser test a poor absolute instrument but a good <em>relative</em> one: ideal for tracking how sleep, time of day, caffeine, or a few weeks of better habits shift your baseline. It's the same logic sleep researchers use with repeated vigilance testing — the trend is the signal.</p>
+  <p>The corollaries are worth stating plainly: don't compare your number against a friend's number from a different device and conclude anything about your nervous systems, and don't treat any online score as a medical measurement. If you have genuine concerns about slowed reactions, that's a conversation for a clinician with calibrated equipment, not a web page.</p>
+
+  <h2>Why we built ReflexZap</h2>
+  <p>Reaction tests are a small genre with a lot of clutter: sign-up walls, results uploaded to leaderboards, pages heavy enough that the test itself stutters. We wanted the opposite — a test that loads instantly, runs entirely client-side, stores your history only on your own device, and is honest in its fine print about what a browser can and can't measure. The whole thing is static HTML, CSS, and a single script; there is no backend because a reaction test doesn't need one.</p>
+  <p>A few design choices follow from that philosophy. The five-round structure with visible per-round results lets you see your own variance instead of hiding it behind one number. False starts restart rather than punish, because the goal is a clean measurement, not a game over. And the percentile comparison is labeled as a rough illustration, because pretending browser data supports precise population rankings would be exactly the kind of dishonesty we built this site to avoid.</p>
+  <p>If you haven't yet: <a href="/">take the test</a>, run it a few days in a row under different conditions, and watch what your own baseline does. That trend line is the most scientifically defensible thing a browser-based reaction test can give you — and it's genuinely interesting.</p>
+
+  <h2>Read next</h2>
+  <div class="faq-item">
+    <h3><a href="/articles/history-of-reaction-time.html">The History of Reaction Time Measurement</a></h3>
+    <p>From a fired astronomer's assistant to modern mental chronometry.</p>
+  </div>
+  <div class="faq-item">
+    <h3><a href="/articles/what-affects-reaction-time.html">What Affects Your Reaction Time — and Can You Improve It?</a></h3>
+    <p>Age, sleep, caffeine, practice: what actually moves the needle.</p>
+  </div>
+  <div class="faq-item">
+    <h3><a href="/articles/reaction-time-in-gaming.html">Reaction Time in Gaming and Esports: Why Milliseconds Matter</a></h3>
+    <p>Peeker's advantage, frame data, and why game sense beats raw speed.</p>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>© <span id="year"></span> reflexzap.com</div>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+    </div>
+  </div>
+</footer>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>
