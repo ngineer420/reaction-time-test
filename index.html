@@ -68,9 +68,17 @@
   </div>
 
   <div class="stage-wrap">
-    <div class="round-status">
-      <span id="round-label">Round 1 of 5</span>
-      <span class="best-chip">Personal best: <strong id="best-chip-value">—</strong></span>
+    <div class="round-status score-strip">
+      <span class="score-cell score-cell--round">
+        <span class="score-val" id="round-label">Round 1 of 5</span>
+      </span>
+      <span class="score-cell score-cell--credit">
+        <span class="score-credit blink">Free Play</span>
+      </span>
+      <span class="score-cell score-cell--best best-chip">
+        <span class="score-cap">Best Time</span>
+        <span class="score-val"><strong id="best-chip-value">—</strong></span>
+      </span>
     </div>
 
     <div class="test-stage state-idle" id="test-stage" role="button" tabindex="0" aria-live="polite" aria-label="Reaction time test area">
@@ -90,6 +98,7 @@
   <section class="panel panel-narrow" id="results-panel" hidden>
     <h2>Your results</h2>
     <div class="rating-banner">
+      <div class="grade-stamp" id="result-grade" aria-hidden="true"></div>
       <div class="rating-label" id="rating-label"></div>
       <div class="rating-note" id="rating-note"></div>
       <div class="rating-percentile" id="rating-percentile"></div>
@@ -209,6 +218,7 @@
 
 <a href="https://erabb.it" class="erabbit-mark" aria-label="erabb.it"><img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐇</text></svg>" width="10" height="10" alt=""></a>
 
+<div class="announce" id="announce" aria-hidden="true"></div>
 <div class="toast" id="toast">Copied!</div>
 <div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
 

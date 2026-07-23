@@ -419,6 +419,43 @@ if (typeof module !== "undefined" && module.exports) {
 
   const toast = document.getElementById("toast");
 
+  /* ---------- arcade cabinet HUD (announce slams + post-match grade) ----------
+     Presentation only — none of this feeds the reaction measurement. The
+     announce is a fixed overlay so it works over the full-bleed test stage; it
+     only fires during the "waiting" phase (fades ~850ms, long before green) or
+     at the too-soon/finish beats, never at the green cue itself. */
+  const announceEl = document.getElementById("announce");
+  const resultGrade = document.getElementById("result-grade");
+  let announceTimer = null;
+  function showAnnounce(text, foul) {
+    if (!announceEl) return;
+    announceEl.classList.toggle("is-foul", !!foul);
+    announceEl.innerHTML = '<span class="announce-text"></span>';
+    announceEl.firstChild.textContent = text;
+    announceEl.classList.remove("show");
+    void announceEl.offsetWidth; // restart the slam animation
+    announceEl.classList.add("show");
+    clearTimeout(announceTimer);
+    announceTimer = setTimeout(() => announceEl.classList.remove("show"), 850);
+  }
+  function gradeForAvg(avg) {
+    if (!Number.isFinite(avg)) return "E";
+    if (avg < 200) return "S";
+    if (avg < 250) return "A";
+    if (avg < 300) return "B";
+    if (avg < 350) return "C";
+    return "D";
+  }
+  function showGrade(avg) {
+    if (!resultGrade) return;
+    const g = gradeForAvg(avg);
+    resultGrade.textContent = g;
+    resultGrade.setAttribute("data-grade", g);
+    resultGrade.classList.remove("show");
+    void resultGrade.offsetWidth;
+    resultGrade.classList.add("show");
+  }
+
   const IDLE_CONTENT_HTML =
     '<p class="stage-title">Ready to test your reflexes?</p>' +
     '<p class="stage-sub">Click Start, then click the box the instant it turns green.</p>';
@@ -507,6 +544,8 @@ if (typeof module !== "undefined" && module.exports) {
     state = "waiting";
     setStageState("state-waiting");
     updateRoundLabel();
+    const rn = currentRound + 1;
+    showAnnounce(rn >= ROUNDS ? "Final Round" : "Round " + rn);
     setStageContentHTML(
       '<p class="stage-title">Wait for green...</p>' +
       '<p class="stage-sub">Click as soon as the box turns green.</p>'
@@ -528,6 +567,7 @@ if (typeof module !== "undefined" && module.exports) {
     setStageState("state-toosoon");
     triggerShake(stageEl);
     playTooSoonBuzz();
+    showAnnounce("Too Soon!", true);
     setStageContentHTML(
       '<p class="stage-title">Not yet!</p>' +
       '<p class="stage-sub">You clicked before it turned green — wait for it next time.</p>'
@@ -593,6 +633,7 @@ if (typeof module !== "undefined" && module.exports) {
         '<p class="stage-title">Test complete!</p>' +
         '<p class="stage-sub">See your results below.</p>'
       );
+      showAnnounce("Clear!");
 
       const avg = computeAverage(roundTimes);
       const best = computeBest(roundTimes);
@@ -637,6 +678,7 @@ if (typeof module !== "undefined" && module.exports) {
       resultsPanel.classList.remove("panel-enter");
       void resultsPanel.offsetWidth;
       resultsPanel.classList.add("panel-enter");
+      showGrade(avg);
       resultsPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }, FINISH_TRANSITION_MS);
   }
