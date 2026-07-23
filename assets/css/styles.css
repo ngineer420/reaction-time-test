@@ -858,3 +858,140 @@ table.rounds-table td.num, table.rounds-table th.num { text-align: right; font-v
   }
   body::before { display: none; }
 }
+
+/* ============================================================
+   ARCADE CABINET HUD — reflexzap's genre = QUICK-DRAW / LIGHTNING
+   DUEL. Shares the CPS-2 arcade chrome with the sibling game sites but
+   stays distinct: electric-yellow announce SLAMS punctuate the duel
+   (ROUND 1 / FINAL ROUND / TOO SOON! / CLEAR!), a BEST-TIME LED HUD,
+   and a post-match letter GRADE — but NO super meter (that's cpsboost's
+   fighting-game thing). The reaction rounds stay full-bleed and
+   uncluttered (accuracy first); the arcade dressing frames the menu +
+   results, and the announce (a fixed overlay above the full-bleed
+   stage) fades ~850ms in — well before the 2s+ green cue.
+   NOTE: the idle .test-stage carries a pixel-corners clip-path, which
+   clips OUTER box-shadows — bezel/glow depth is border + INSET only.
+   ============================================================ */
+
+/* --- arcade HUD score strip (idle / results view) --- */
+.round-status.score-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.score-cell { display: flex; flex-direction: column; gap: 3px; }
+.score-cell--best { align-items: flex-end; text-align: right; }
+.score-cell--credit { align-self: center; }
+.score-cap {
+  font-size: 9.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  text-shadow: 0 0 8px var(--cyan-glow);
+}
+.score-val {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.score-cell--best .score-val strong { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+.score-credit {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent-glow);
+}
+.blink { animation: arcade-blink 1.05s steps(1) infinite; }
+@keyframes arcade-blink { 0%, 55% { opacity: 1; } 55.01%, 100% { opacity: 0; } }
+
+/* --- CRT bezel + attract pulse on the idle/contained stage --- */
+.test-stage:not(.is-active) {
+  border: 4px solid var(--bg-inset);
+  box-shadow: inset 0 0 50px -14px rgba(0, 0, 0, .85);
+}
+.test-stage:not(.is-active)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(118% 130% at 50% 45%, transparent 60%, rgba(0, 0, 0, .3) 100%);
+}
+.test-stage.state-idle { animation: reflex-attract 1.9s ease-in-out infinite; }
+@keyframes reflex-attract {
+  0%, 100% { border-color: var(--bg-inset); box-shadow: inset 0 0 50px -14px rgba(0, 0, 0, .85); }
+  50% { border-color: var(--accent-dim); box-shadow: inset 0 0 50px -14px rgba(0, 0, 0, .85), inset 0 0 30px -6px var(--accent-glow); }
+}
+
+/* --- announce SLAM (fixed overlay; sits above the full-bleed stage) --- */
+.announce {
+  position: fixed;
+  inset: 0;
+  z-index: 1150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+}
+.announce.show { opacity: 1; }
+.announce .announce-text {
+  font-family: var(--sans);
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(40px, 11vw, 88px);
+  text-transform: uppercase;
+  letter-spacing: -.01em;
+  color: var(--accent);
+  -webkit-text-stroke: 2px var(--accent-contrast);
+  paint-order: stroke fill;
+  text-shadow: 5px 5px 0 var(--accent-dim), 0 0 34px var(--accent-glow);
+  transform: skewX(-8deg);
+  animation: announce-slam .5s cubic-bezier(.2, 1.4, .4, 1);
+}
+.announce.is-foul .announce-text {
+  color: var(--danger);
+  -webkit-text-stroke-color: #2a0510;
+  text-shadow: 5px 5px 0 #5a0f1e, 0 0 34px rgba(255, 51, 85, .5);
+}
+@keyframes announce-slam {
+  0% { transform: skewX(-8deg) scale(2.4); opacity: 0; }
+  55% { transform: skewX(-8deg) scale(.92); opacity: 1; }
+  100% { transform: skewX(-8deg) scale(1); opacity: 1; }
+}
+
+/* --- post-match letter GRADE stamp --- */
+.rating-banner { position: relative; }
+.grade-stamp {
+  display: none;
+  font-family: var(--sans);
+  font-weight: 900;
+  font-style: italic;
+  font-size: 58px;
+  line-height: 1;
+  color: var(--accent);
+  -webkit-text-stroke: 3px var(--accent-contrast);
+  paint-order: stroke fill;
+  text-shadow: 4px 4px 0 var(--accent-dim), 0 0 26px var(--accent-glow);
+  margin-bottom: 4px;
+}
+.grade-stamp.show { display: inline-block; animation: grade-stamp-in .45s cubic-bezier(.2, 1.4, .4, 1); }
+.grade-stamp[data-grade="S"] { color: #fff; }
+@keyframes grade-stamp-in {
+  0% { transform: scale(2.2) rotate(-12deg); opacity: 0; }
+  60% { transform: scale(.9) rotate(-6deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-6deg); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .test-stage.state-idle,
+  .blink { animation: none; }
+  .announce .announce-text,
+  .grade-stamp.show { animation: none; }
+}
