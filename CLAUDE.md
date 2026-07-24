@@ -97,3 +97,30 @@ Worktree under `.claude/worktrees/`, open a PR, merge when Max says (currently
 render of the idle screen; force the results + announce state via a throwaway
 preview (strip `app.js`, un-hide `#results-panel`, add `.show`/content to
 `.announce` and `.grade-stamp`) since `--screenshot` can't drive the game.
+
+## PIXEL-ART REFLEX DUEL overhaul (supersedes the sections above)
+
+reflexzap was rebuilt from the "web-slick" arcade pass into a genuine
+**pixel-art cabinet** (bar: metekamil.com). Key shifts:
+- **Self-hosted pixel font** `assets/fonts/pressstart2p.woff2` (Press Start 2P,
+  OFL) via `@font-face "PixArc"`, applied to all arcade text. This is the one
+  deliberate exception to "system-fonts only" — it is **same-origin**, so it
+  still makes **no third-party request** (the privacy intent of the rule holds).
+- **Pixel-art discipline**: FLAT colours, HARD pixel edges (layered
+  `box-shadow` borders, `border-radius:0`), `image-rendering: pixelated`, hard
+  offset `text-shadow` (no `-webkit-text-stroke`/`skewX`, no smooth glows). An
+  animated diagonal-stripe backdrop on `.crt-screen`.
+- **Full cabinet**: `.cabinet` → `.marquee` (pixel logo) → `.crt`/`.crt-screen`
+  (VS `.duel-hud`: YOU/RIVAL names + `.pips` best-of-5, `ROUND/BEST`, the
+  contained reaction stage) → `.deck` (DRAW! pixel button + coin door + player
+  card). See the "REFLEX DUEL" block at the bottom of `styles.css`.
+- **The full-bleed rule is REVERSED**: the reaction stage is now **contained**
+  inside the CRT (`.test-stage.is-active` overridden to `position:relative`),
+  so only the CRT flashes colour — the cabinet is the frame. `body.test-active`
+  still toggles (hides `.credit-line` during a round).
+- **Duel pips** (`#pips-you`/`#pips-rival`, `resetPips`/`lightPip` in app.js):
+  each round is a draw vs a CPU rival (`elapsed < 240+rand*170`) — pure flavour,
+  never touches timing.
+- **Cache-bust adopted**: `styles.css?v=` / `app.js?v=` on every page. **Bump
+  the `?v=` on any coupled HTML+CSS/JS change** or cached visitors get new HTML
+  with stale CSS (this exact bug hit cpsboost). Currently `?v=2`.
