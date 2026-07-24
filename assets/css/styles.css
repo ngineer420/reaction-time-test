@@ -995,3 +995,133 @@ table.rounds-table td.num, table.rounds-table th.num { text-align: right; font-v
   .announce .announce-text,
   .grade-stamp.show { animation: none; }
 }
+
+/* ============================================================
+   REFLEX DUEL — full pixel-art arcade cabinet (metekamil-grade).
+   True 8-bit: a self-hosted pixel font (Press Start 2P, OFL, same-
+   origin — no third-party request), FLAT colours, HARD pixel edges,
+   image-rendering: pixelated, animated stripe backdrop, a VS duel HUD.
+   No smooth web gradients/glows — that's the difference between "web
+   pretending to be arcade" and actual arcade.
+   Genre = QUICK-DRAW DUEL (YOU vs RIVAL, best of 5 draws).
+   ============================================================ */
+@font-face {
+  font-family: "PixArc";
+  src: url("/assets/fonts/pressstart2p.woff2") format("woff2");
+  font-display: swap;
+}
+.marquee-logo, .marquee-sub, .duelist-name, .dc-round, .dc-best,
+.credit-line, .stage-title, .stage-sub, .stage-time, .stage-round-pill,
+.start-text, .pc-rank, .pc-xp, .rating-banner .rating-label,
+.announce .announce-text, .grade-stamp, .coin-door, .deck-label {
+  font-family: "PixArc", var(--mono) !important;
+  text-transform: uppercase;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+}
+
+main { max-width: 860px; }
+
+.cabinet { max-width: 820px; margin: 4px auto 0; }
+
+/* ---- pixel marquee ---- */
+.marquee {
+  position: relative; text-align: center; padding: 16px 12px 14px; margin-bottom: 14px;
+  background: #1a0033;
+  box-shadow: 0 0 0 4px #000, 0 0 0 8px var(--accent), 0 0 0 12px #000;
+  overflow: visible;
+}
+.marquee::after { display: none; }
+.marquee-logo { display: block; line-height: 1.1; }
+.marquee-logo .mq-1, .marquee-logo .mq-2 { -webkit-text-stroke: 0 !important; text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 4px 4px 0 var(--accent-dim) !important; }
+.marquee-logo .mq-1 { font-size: clamp(13px, 3vw, 22px); color: #fff; }
+.marquee-logo .mq-2 { font-size: clamp(18px, 4vw, 30px); color: var(--accent); }
+.marquee-sub { margin-top: 10px; font-size: 7px; color: #ffe600cc; text-shadow: 2px 2px 0 #000; }
+
+/* ---- CRT: hard pixel bezel + animated stripe screen ---- */
+.crt { position: relative; padding: 12px; background: #000; box-shadow: 0 0 0 4px #241534, inset 0 0 0 2px #000; }
+.crt::before, .crt::after { display: none; }
+.crt-screen {
+  clip-path: none !important; border: none !important; border-radius: 0 !important;
+  max-width: none !important; margin: 0 !important; padding: 16px 16px 18px !important;
+  position: relative; overflow: hidden; image-rendering: pixelated;
+  background:
+    repeating-linear-gradient(45deg, #1a1236 0 16px, #221846 16px 32px) !important;
+  box-shadow: inset 0 0 0 3px #000, inset 0 0 0 6px #3a2a5e !important;
+  animation: stripe-scroll 3.2s linear infinite;
+}
+@keyframes stripe-scroll { from { background-position: 0 0; } to { background-position: 45px 0; } }
+.crt-screen::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 5; background: repeating-linear-gradient(180deg, rgba(0,0,0,.22) 0 2px, transparent 2px 4px); }
+.crt-screen > * { position: relative; z-index: 1; }
+.crt-glare { display: none; }
+
+/* ---- VS duel HUD ---- */
+.duel-hud { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin-bottom: 12px; }
+.duelist { display: flex; flex-direction: column; gap: 8px; }
+.duelist--rival { align-items: flex-end; }
+.duelist-name { font-size: 12px; color: #fff; text-shadow: 2px 2px 0 #000; }
+.duelist--you .duelist-name { color: var(--accent); }
+.duelist--rival .duelist-name { color: #ff4d6b; }
+.pips { display: inline-flex; gap: 6px; }
+.pip { width: 12px; height: 12px; background: #0a0618; box-shadow: 0 0 0 2px #000, inset 0 0 0 2px #3a2a5e; }
+.pip.win { background: var(--accent); box-shadow: 0 0 0 2px #000, inset 0 0 0 2px #fff; }
+.pip.loss { background: #ff4d6b; box-shadow: 0 0 0 2px #000, inset 0 0 0 2px #fff; }
+.duel-center { text-align: center; display: flex; flex-direction: column; gap: 6px; }
+.dc-round { font-size: 10px; color: var(--accent); text-shadow: 2px 2px 0 #000; }
+.dc-best { font-size: 7px; color: #b3a3d9; }
+.dc-best b { color: var(--accent); }
+
+.credit-line { text-align: center; font-size: 8px; color: var(--accent); text-shadow: 2px 2px 0 #000; margin: 0 0 10px; height: 12px; }
+body.test-active .credit-line { visibility: hidden; }
+
+/* ---- contained pixel reaction stage (no more full-bleed) ---- */
+.test-stage.is-active {
+  position: relative !important; inset: auto !important; width: auto !important; height: auto !important;
+  z-index: 1 !important; animation: none !important;
+}
+body.test-active { overflow: auto; }
+.test-stage {
+  clip-path: none !important; border: none !important; border-radius: 0 !important;
+  min-height: 260px; padding: 26px 18px;
+  box-shadow: inset 0 0 0 3px #000, 0 0 0 4px #000, 0 0 0 7px #3a2a5e;
+}
+.test-stage .stage-title { font-size: clamp(13px, 3vw, 20px); line-height: 1.5; text-shadow: 3px 3px 0 #000; }
+.test-stage.is-active .stage-title { font-size: clamp(16px, 4vw, 26px); }
+.test-stage .stage-sub { font-size: 8px; line-height: 2; color: #cdbce6; text-shadow: 1px 1px 0 #000; }
+.test-stage .stage-time { font-family: "PixArc", var(--mono) !important; font-size: clamp(26px, 7vw, 52px); text-shadow: 3px 3px 0 #000; }
+.stage-round-pill { font-size: 7px !important; box-shadow: 0 0 0 2px #000; border-radius: 0 !important; }
+
+/* ---- pixel control deck ---- */
+.deck { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "player start"; align-items: center; gap: 16px; margin-top: 14px; padding: 16px 18px; background: #1a1030; box-shadow: 0 0 0 4px #000, inset 0 0 0 2px #3a2a5e; }
+.deck-center { grid-area: start; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.start-btn { position: relative; padding: 16px 26px; border: none; background: var(--accent); color: #1a1400; box-shadow: 0 6px 0 #8a7a00, 0 0 0 4px #000; transition: transform .05s, box-shadow .05s; image-rendering: pixelated; }
+.start-btn:hover { border: none; filter: brightness(1.06); }
+.start-btn:active { transform: translateY(6px); box-shadow: 0 0 0 4px #000; }
+.start-btn:disabled { opacity: .5; }
+.start-ring { display: none; }
+.start-text { font-size: 13px; color: #1a1400; text-shadow: none; }
+.coin-door { display: flex; align-items: center; gap: 6px; font-size: 6px; color: #7268a0; }
+.coin-slot { width: 20px; height: 5px; background: #000; box-shadow: 0 0 0 2px #3a2a5e; }
+.player-card { grid-area: player; padding: 10px 12px; background: #0e0820; box-shadow: 0 0 0 2px #000, inset 0 0 0 2px #3a2a5e; }
+.pc-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.pc-rank { font-size: 8px; color: var(--accent); text-shadow: 2px 2px 0 #000; }
+.pc-xp { font-size: 7px; color: #7268a0; }
+.pc-bar { height: 10px; margin-top: 7px; background: #000; box-shadow: inset 0 0 0 2px #3a2a5e; }
+.pc-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width .3s steps(8); }
+
+/* ---- pixel announce + grade (flat, hard shadow, no skew) ---- */
+.announce .announce-text {
+  font-size: clamp(20px, 7vw, 46px) !important; color: var(--accent) !important;
+  -webkit-text-stroke: 0 !important; transform: none !important;
+  text-shadow: 4px 4px 0 #000, -2px -2px 0 #000, 6px 6px 0 var(--accent-dim) !important;
+}
+.announce.is-foul .announce-text { color: #ff4d6b !important; text-shadow: 4px 4px 0 #000, 6px 6px 0 #7a0f2a !important; }
+.grade-stamp { -webkit-text-stroke: 0 !important; transform: rotate(-4deg) !important; font-size: 40px !important; color: var(--accent) !important; text-shadow: 4px 4px 0 #000 !important; }
+.rating-banner .rating-label { font-size: 14px !important; }
+
+@media (max-width: 560px) {
+  .deck { grid-template-columns: 1fr; grid-template-areas: "start" "player"; justify-items: center; }
+  .duelist-name { font-size: 9px; }
+  .pip { width: 9px; height: 9px; }
+}
+@media (prefers-reduced-motion: reduce) { .crt-screen { animation: none; } }

@@ -19,7 +19,7 @@
 <meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
 
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/assets/css/styles.css?v=2">
 
 <script type="application/ld+json">
 {
@@ -57,41 +57,52 @@
 </header>
 
 <main id="main">
-  <div class="hero">
-    <div class="hero-sign"><h1>Reaction Time Test</h1></div>
-    <p>How fast are your reflexes? Click the box the instant it turns green — 5 rounds, timed to the millisecond.</p>
-    <p class="trust-line">Runs 100% in your browser<span class="dot">•</span>No sign-up<span class="dot">•</span>Free forever</p>
-    <div class="xp-bar-wrap">
-      <div class="xp-bar-label"><span class="xp-rank" id="xp-rank-label">Rookie Reflex</span><span id="xp-progress-label">0 / 100 XP</span></div>
-      <div class="xp-bar-track"><div class="xp-bar-fill" id="xp-bar-fill"></div></div>
-    </div>
-  </div>
-
-  <div class="stage-wrap">
-    <div class="round-status score-strip">
-      <span class="score-cell score-cell--round">
-        <span class="score-val" id="round-label">Round 1 of 5</span>
-      </span>
-      <span class="score-cell score-cell--credit">
-        <span class="score-credit blink">Free Play</span>
-      </span>
-      <span class="score-cell score-cell--best best-chip">
-        <span class="score-cap">Best Time</span>
-        <span class="score-val"><strong id="best-chip-value">—</strong></span>
-      </span>
+  <div class="cabinet">
+    <div class="marquee">
+      <div class="marquee-logo"><span class="mq-1">Reflex</span><span class="mq-2">Duel</span></div>
+      <div class="marquee-sub">Quickest Draw Wins · reflexzap.com</div>
     </div>
 
-    <div class="test-stage state-idle" id="test-stage" role="button" tabindex="0" aria-live="polite" aria-label="Reaction time test area">
-      <div class="stage-round-pill" id="stage-round-pill" aria-hidden="true">Round 1 of 5</div>
-      <button type="button" id="stage-cancel-btn" class="stage-cancel" aria-label="Cancel test">✕</button>
-      <div id="stage-content">
-        <p class="stage-title">Ready to test your reflexes?</p>
-        <p class="stage-sub">Click Start, then click the box the instant it turns green.</p>
+    <div class="crt">
+      <div class="crt-screen">
+        <div class="duel-hud">
+          <div class="duelist duelist--you">
+            <span class="duelist-name">You</span>
+            <span class="pips" id="pips-you"></span>
+          </div>
+          <div class="duel-center">
+            <span class="dc-round" id="round-label">Round 1 of 5</span>
+            <span class="dc-best">Best <b id="best-chip-value">—</b></span>
+          </div>
+          <div class="duelist duelist--rival">
+            <span class="pips" id="pips-rival"></span>
+            <span class="duelist-name">Rival</span>
+          </div>
+        </div>
+
+        <div class="credit-line"><span class="blink" id="score-credit">Free Play</span></div>
+
+        <div class="test-stage state-idle" id="test-stage" role="button" tabindex="0" aria-live="polite" aria-label="Reaction time test area">
+          <div class="stage-round-pill" id="stage-round-pill" aria-hidden="true">Round 1 of 5</div>
+          <button type="button" id="stage-cancel-btn" class="stage-cancel" aria-label="Cancel test">✕</button>
+          <div id="stage-content">
+            <p class="stage-title">Ready to draw?</p>
+            <p class="stage-sub">Hit Draw, then strike the instant the screen turns green.</p>
+          </div>
+        </div>
       </div>
+      <div class="crt-glare" aria-hidden="true"></div>
     </div>
 
-    <div class="btn-row" id="stage-controls">
-      <button type="button" id="start-btn" class="primary">Start test</button>
+    <div class="deck">
+      <div class="deck-center" id="stage-controls">
+        <button type="button" id="start-btn" class="start-btn"><span class="start-ring"></span><span class="start-text">Draw!</span></button>
+        <div class="coin-door" aria-hidden="true"><span class="coin-slot"></span>Insert Coin · Free Play</div>
+      </div>
+      <div class="player-card">
+        <div class="pc-top"><span class="pc-rank" id="xp-rank-label">Rookie Reflex</span><span class="pc-xp" id="xp-progress-label">0 / 100 XP</span></div>
+        <div class="pc-bar"><div class="pc-bar-fill" id="xp-bar-fill"></div></div>
+      </div>
     </div>
   </div>
 
@@ -222,6 +233,6 @@
 <div class="toast" id="toast">Copied!</div>
 <div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
 
-<script src="/assets/js/app.js"></script>
+<script src="/assets/js/app.js?v=2"></script>
 </body>
 </html>

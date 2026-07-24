@@ -456,6 +456,21 @@ if (typeof module !== "undefined" && module.exports) {
     resultGrade.classList.add("show");
   }
 
+  // Duel pips: each round is a draw vs a CPU rival — beat its reaction and your
+  // pip lights, else the rival's does. Pure flavour on top of the real timing.
+  const pipsYou = document.getElementById("pips-you");
+  const pipsRival = document.getElementById("pips-rival");
+  function buildPips(el) {
+    if (!el) return;
+    el.innerHTML = "";
+    for (var i = 0; i < 5; i++) { var p = document.createElement("span"); p.className = "pip"; el.appendChild(p); }
+  }
+  function resetPips() { buildPips(pipsYou); buildPips(pipsRival); }
+  function lightPip(idx, youWin) {
+    var el = youWin ? pipsYou : pipsRival;
+    if (el && el.children[idx]) el.children[idx].className = "pip " + (youWin ? "win" : "loss");
+  }
+
   const IDLE_CONTENT_HTML =
     '<p class="stage-title">Ready to test your reflexes?</p>' +
     '<p class="stage-sub">Click Start, then click the box the instant it turns green.</p>';
@@ -536,6 +551,7 @@ if (typeof module !== "undefined" && module.exports) {
     earlyClickCount = 0;
     resultsPanel.hidden = true;
     stageControls.hidden = true;
+    resetPips();
     enterFullBleed();
     beginRound();
   }
@@ -582,6 +598,7 @@ if (typeof module !== "undefined" && module.exports) {
     const rawElapsed = performance.now() - greenAt;
     const elapsed = Math.max(0, Math.round(Number.isFinite(rawElapsed) ? rawElapsed : 0));
     roundTimes.push(elapsed);
+    lightPip(currentRound, elapsed < 240 + Math.random() * 170);
     playClickBlip();
 
     state = "round-result";
@@ -881,6 +898,7 @@ if (typeof module !== "undefined" && module.exports) {
   });
 
   /* ---------- init ---------- */
+  resetPips();
   renderBestChip();
   renderHistory(loadHistory());
   renderStatusChips(loadProfile());
