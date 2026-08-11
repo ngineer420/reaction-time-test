@@ -19,7 +19,7 @@
 <meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
 
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/styles.css?v=2">
+<link rel="stylesheet" href="/assets/css/styles.css?v=3">
 
 <script type="application/ld+json">
 {
@@ -81,6 +81,10 @@
         </div>
 
         <div class="credit-line"><span class="blink" id="score-credit">Free Play</span></div>
+        <div class="challenge-banner" id="challenge-banner" hidden>
+          <span class="cb-kicker">Challenge</span>
+          <span class="cb-text" id="challenge-text"></span>
+        </div>
 
         <div class="test-stage state-idle" id="test-stage" role="button" tabindex="0" aria-live="polite" aria-label="Reaction time test area">
           <div class="stage-round-pill" id="stage-round-pill" aria-hidden="true">Round 1 of 5</div>
@@ -114,6 +118,7 @@
       <div class="rating-note" id="rating-note"></div>
       <div class="rating-percentile" id="rating-percentile"></div>
     </div>
+    <div class="challenge-verdict" id="challenge-verdict" hidden></div>
 
     <div class="chart-card">
       <div class="chart-card-title">Your 5 rounds</div>
@@ -143,7 +148,7 @@
 
     <div class="btn-row">
       <button type="button" id="retry-btn" class="primary">Test again</button>
-      <button type="button" id="copy-btn" class="icon-btn">Copy result</button>
+      <button type="button" id="copy-btn" class="icon-btn">Copy challenge link</button>
     </div>
     <p class="disclaimer">This is a fun, approximate browser-based test — not a scientific or medical instrument. Your measured time includes your device's screen refresh rate, input latency, and browser/OS rendering delay, which can add roughly 20–80ms of noise on top of your true reaction time. The percentile comparison above is a rough, illustrative estimate for fun — not a scientific ranking. Use it to track your own trend over time, not as an exact clinical measurement.</p>
   </section>
@@ -233,6 +238,6 @@
 <div class="toast" id="toast">Copied!</div>
 <div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
 
-<script src="/assets/js/app.js?v=2"></script>
+<script src="/assets/js/app.js?v=3"></script>
 </body>
 </html>
