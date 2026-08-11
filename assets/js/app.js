@@ -667,6 +667,7 @@ if (typeof module !== "undefined" && module.exports) {
       saveHistory(trimmed);
 
       renderResults(avg, best, newAllTimeBest);
+      renderChallengeVerdict(avg);
       renderHistory(trimmed);
 
       const gameResult = recordSession({
@@ -838,12 +839,73 @@ if (typeof module !== "undefined" && module.exports) {
     }, TOAST_DISPLAY_MS);
   }
 
+  /* ---------- friend challenge links ----------
+     A shared result is a URL, not a dead text blob: `?ms=245` opens the test
+     with the sender's average shown as the time to beat, and a verdict once
+     you finish. Lower is better here, so the comparison inverts relative to
+     the sibling cabinets. The param is validated before use — a hand-edited or
+     hostile query string can only degrade to "no challenge". */
+
+  const challengeBanner = document.getElementById("challenge-banner");
+  const challengeText = document.getElementById("challenge-text");
+  const challengeVerdict = document.getElementById("challenge-verdict");
+  let challenge = null; // { ms } once a valid challenge link is opened
+
+  function readChallengeFromUrl() {
+    let params;
+    try {
+      params = new URLSearchParams(window.location.search);
+    } catch (e) {
+      return null;
+    }
+    const ms = Number(params.get("ms"));
+    // Outside a plausible human reaction time this is junk, not a challenge:
+    // sub-50ms is physically impossible and 5s+ is not a real reading.
+    if (!Number.isFinite(ms) || ms < 50 || ms > 5000) return null;
+    return { ms: Math.round(ms) };
+  }
+
+  function buildChallengeUrl(avg) {
+    return `${SITE_URL}?ms=${Math.round(avg)}`;
+  }
+
+  function applyChallenge() {
+    challenge = readChallengeFromUrl();
+    if (!challenge) return;
+    if (challengeText) {
+      challengeText.textContent =
+        `A friend averaged ${challenge.ms}ms over 5 rounds. Beat it.`;
+    }
+    if (challengeBanner) challengeBanner.hidden = false;
+  }
+
+  function renderChallengeVerdict(avg) {
+    if (!challengeVerdict) return;
+    if (!challenge || !Number.isFinite(avg)) {
+      challengeVerdict.hidden = true;
+      return;
+    }
+    const diff = avg - challenge.ms; // negative = you were faster
+    challengeVerdict.hidden = false;
+    challengeVerdict.classList.toggle("is-win", diff < 0);
+    challengeVerdict.classList.toggle("is-loss", diff > 0);
+    if (diff < 0) {
+      challengeVerdict.textContent =
+        `Challenge beaten — ${Math.abs(diff)}ms faster than their ${challenge.ms}ms.`;
+    } else if (diff === 0) {
+      challengeVerdict.textContent = `Dead heat — you matched their ${challenge.ms}ms exactly.`;
+    } else {
+      challengeVerdict.textContent =
+        `Challenge missed by ${diff}ms — they averaged ${challenge.ms}ms. Try again.`;
+    }
+  }
+
   function copyResult() {
     const avg = computeAverage(roundTimes);
     if (!Number.isFinite(avg)) return;
     const profile = loadProfile();
     const rank = titleForLevel(levelForXp(profile.totalXP));
-    const text = `My average reaction time is ${avg}ms on Reaction Time Test (${rank}, LV ${levelForXp(profile.totalXP)})! Try to beat me: ${SITE_URL}`;
+    const text = `My average reaction time is ${avg}ms on Reaction Time Test (${rank}, LV ${levelForXp(profile.totalXP)})! Beat me: ${buildChallengeUrl(avg)}`;
 
     function fallbackCopy() {
       const ta = document.createElement("textarea");
@@ -854,12 +916,12 @@ if (typeof module !== "undefined" && module.exports) {
       ta.select();
       try { document.execCommand("copy"); } catch (e) { /* ignore */ }
       document.body.removeChild(ta);
-      showToast("Copied!");
+      showToast("Challenge link copied!");
     }
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(
-        () => showToast("Copied!"),
+        () => showToast("Challenge link copied!"),
         () => fallbackCopy()
       );
     } else {
@@ -898,6 +960,7 @@ if (typeof module !== "undefined" && module.exports) {
   });
 
   /* ---------- init ---------- */
+  applyChallenge();
   resetPips();
   renderBestChip();
   renderHistory(loadHistory());

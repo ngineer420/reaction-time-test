@@ -84,6 +84,24 @@ Presentation only — **never touches the reaction measurement**:
 - The `erabb.it` 🐇 mark is the portfolio signature — last in `<body>`, flush to
   the corner, `cursor: default`.
 
+## Friend challenge links (URL state)
+
+A shared result is a **URL**, not a dead text blob. `#copy-btn` copies
+`https://reflexzap.com/?ms=<avg>`; opening that link shows `#challenge-banner`
+on the CRT with the sender's average as the time to beat, and renders
+`#challenge-verdict` (`.is-win` / `.is-loss`) on the results panel once you
+finish all 5 rounds.
+
+- `ms` — must be finite and within `50 <= ms <= 5000`. Sub-50ms is physically
+  impossible and 5s+ is not a real reading, so both are treated as junk.
+- **Lower is better here**, so the comparison inverts relative to cpsboost and
+  flicktrainer — `diff < 0` is the win branch.
+- **Validate every param before use.** A hand-edited or hostile query string
+  must only ever degrade to "no challenge"; banner text is set via
+  `textContent` so it can't inject markup.
+- The banner is `visibility: hidden` under `body.test-active` (same rule the
+  credit line uses), so it can never distract from the green cue mid-round.
+
 ## localStorage keys
 
 `reflexzap_theme`, `reflexzap_sound_muted`, `reflexzap_profile` (XP/level/streak/
@@ -123,4 +141,4 @@ reflexzap was rebuilt from the "web-slick" arcade pass into a genuine
   never touches timing.
 - **Cache-bust adopted**: `styles.css?v=` / `app.js?v=` on every page. **Bump
   the `?v=` on any coupled HTML+CSS/JS change** or cached visitors get new HTML
-  with stale CSS (this exact bug hit cpsboost). Currently `?v=2`.
+  with stale CSS (this exact bug hit cpsboost). Currently `?v=3`.
