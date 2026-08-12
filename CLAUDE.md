@@ -148,7 +148,38 @@ reflexzap was rebuilt from the "web-slick" arcade pass into a genuine
   never touches timing.
 - **Cache-bust adopted**: `styles.css?v=` / `app.js?v=` on every page. **Bump
   the `?v=` on any coupled HTML+CSS/JS change** or cached visitors get new HTML
-  with stale CSS (this exact bug hit cpsboost). Currently `?v=4`.
+  with stale CSS (this exact bug hit cpsboost). Currently `?v=5`.
+
+## The nav toolbar — never hand-edit it
+
+Every page carries the portfolio toolbar (spec:
+`ngineer420/ngineer420.github.io#13`) as a `<nav class="toolbar">` between
+`<!-- nav:start -->` / `<!-- nav:end -->`, a direct child of `<body>` right
+after `</header>`.
+
+- **`tools/nav_data.py` is the only file you edit.** `tools/sync_nav.py` is the
+  generic portfolio script, byte-identical across sites — do not modify it.
+  `python3 tools/sync_nav.py` rewrites the block in all ten `.html` files;
+  `--check` exits nonzero on drift and is worth running before you push.
+- The rail is the five tier-1 destinations (percentile reference + four
+  guides). The test is the sheet's **hub row**, not a rail chip, because Home is
+  the brand — it is the one destination in the chrome that is not a peer of the
+  list above it, and it is what gives `index.html` an `aria-current` target.
+- **Not sticky.** Neither the header nor the bar; the spec forbids it (sticky
+  chrome can overlay an AdSense anchor unit). Closed chrome is 51px header +
+  45px bar = **96px at every width**; the 100px ceiling is the budget, so any
+  header change has to be measured, not eyeballed.
+- `assets/js/nav.js` is loaded by every page and is pure enhancement (active
+  chip centring, edge fades, Escape, click-outside). It is separate from
+  `app.js` because only `index.html` loads the duel engine. With JS off the
+  `<details>` still discloses, the rail still scrolls and the scrim is still
+  CSS.
+- **One bolt.** `.bolt` is an empty span painted by a CSS mask (`--bolt-mark`)
+  so it follows `--accent` through the theme switch. The 90-rect inline SVG on
+  index and the ⚡ emoji on the articles are gone — that split is exactly how
+  the two headers drifted apart. Every page's header markup is now identical
+  apart from `.header-actions`, which stays on `index.html` alone because its
+  buttons are driven by `app.js`.
 
 ## The percentile engine (`assets/js/percentile.js`) — read before touching
 
