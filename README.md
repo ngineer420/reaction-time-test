@@ -38,7 +38,10 @@ assets/css/styles.css   Design system
 assets/js/percentile.js Cited percentile engine (DOM-free, drop-in reusable)
 assets/js/app.js        All app logic: timing state machine, stats/rating logic,
                           localStorage persistence, clipboard share, theme toggle
+assets/js/nav.js        Toolbar behaviour (edge fades, Escape, click-outside)
 assets/favicon.svg      Original lightning-bolt favicon
+tools/nav_data.py       The nav's single source of truth (destinations, labels)
+tools/sync_nav.py       Renders the toolbar into every .html between markers
 test/percentile.test.js  node:test coverage for the percentile engine
 CNAME                    GitHub Pages custom domain (reflexzap.com)
 robots.txt / sitemap.xml SEO basics

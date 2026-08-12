@@ -271,7 +271,9 @@ test("the reference page carries the portfolio furniture", () => {
   const adTags = pageHtml.match(/adsbygoogle\.js\?client=ca-pub-7560786263587509/g) || [];
   assert.strictEqual(adTags.length, 1, "exactly one Auto-ads script tag");
   assert.ok(!/class="[^"]*ad-slot/.test(pageHtml), "no manually placed ad units");
-  assert.match(pageHtml, /<\/footer>\s*(<script>[^<]*<\/script>\s*)?<a href="https:\/\/erabb\.it" class="erabbit-mark"/);
+  // Scripts may sit between the footer and the mark — the year stamp, and the
+  // toolbar's nav.js, which loads last so the chrome never blocks the article.
+  assert.match(pageHtml, /<\/footer>\s*(<script[^>]*>[^<]*<\/script>\s*)*<a href="https:\/\/erabb\.it" class="erabbit-mark"/);
   assert.match(pageHtml, /erabbit-mark[\s\S]*?<\/a>\s*<\/body>/, "the mark must be the last element in body");
   assert.ok(pageHtml.includes('aria-current="page"'), "the active nav link must be marked");
 });
