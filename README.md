@@ -8,8 +8,11 @@ A free, ad-supported reaction time test:
 - Personal best (fastest round ever) and a history of the last 10 test sessions are persisted in the browser via `localStorage`.
 - Works on desktop (mouse) and mobile (touch) via a single `pointerdown` listener, so clicks aren't double-counted.
 - "Copy result" button copies a shareable summary to the clipboard.
+- A **percentile** for the session average, plus the visitor's marker drawn on an inline SVG of the distribution, and a `/reaction-time-percentiles/` reference page carrying the full table, age bands, methodology and sources.
 
 Everything runs client-side — no backend, no build step, no uploads. Deployed as static files on GitHub Pages.
+
+> **The percentiles are a model of published research, not this site's data.** There is no backend, so no results are ever collected or aggregated. See `assets/js/percentile.js` for the model and the citation for every figure in it.
 
 ## Local development
 
@@ -25,16 +28,32 @@ Then open `http://localhost:8000`.
 
 ```
 index.html              Main app (test stage, results, history, FAQ)
+reaction-time-percentiles/index.html   Percentile reference page (clean path)
+reaction-time-percentiles.html         Flat alias of the same page
+articles/                Long-form SEO articles
 privacy.html             Privacy policy (required for ad networks)
 terms.html                Terms of use
 404.html                   Not-found page
 assets/css/styles.css   Design system
+assets/js/percentile.js Cited percentile engine (DOM-free, drop-in reusable)
 assets/js/app.js        All app logic: timing state machine, stats/rating logic,
                           localStorage persistence, clipboard share, theme toggle
 assets/favicon.svg      Original lightning-bolt favicon
+test/percentile.test.js  node:test coverage for the percentile engine
 CNAME                    GitHub Pages custom domain (reflexzap.com)
 robots.txt / sitemap.xml SEO basics
 ```
+
+## Tests
+
+```
+node --test 'test/*.test.js'
+```
+
+No `package.json` and no dependencies — `node:test` and `node:assert` only. The suite covers
+the percentile engine's monotonicity and bounds, checks the reference page's static table
+still matches the model, and greps every shipped page for copy that would imply the
+percentiles come from this site's own visitors.
 
 ## Enabling ads (Google AdSense)
 

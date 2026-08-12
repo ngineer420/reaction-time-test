@@ -19,7 +19,7 @@
 <meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
 
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/styles.css?v=3">
+<link rel="stylesheet" href="/assets/css/styles.css?v=4">
 
 <script type="application/ld+json">
 {
@@ -120,6 +120,12 @@
     </div>
     <div class="challenge-verdict" id="challenge-verdict" hidden></div>
 
+    <div class="dist-card" id="dist-card" hidden>
+      <div class="chart-card-title">Where that lands in the published distribution</div>
+      <div id="dist-chart"></div>
+      <p class="dist-source">Modelled from simple visual reaction times reported in published studies and one large public web dataset — <strong>not</strong> from results recorded on this site, which stores nothing off your device. <a href="/reaction-time-percentiles/">See the full table, age bands and sources</a>.</p>
+    </div>
+
     <div class="chart-card">
       <div class="chart-card-title">Your 5 rounds</div>
       <div id="rounds-chart"></div>
@@ -150,7 +156,7 @@
       <button type="button" id="retry-btn" class="primary">Test again</button>
       <button type="button" id="copy-btn" class="icon-btn">Copy challenge link</button>
     </div>
-    <p class="disclaimer">This is a fun, approximate browser-based test — not a scientific or medical instrument. Your measured time includes your device's screen refresh rate, input latency, and browser/OS rendering delay, which can add roughly 20–80ms of noise on top of your true reaction time. The percentile comparison above is a rough, illustrative estimate for fun — not a scientific ranking. Use it to track your own trend over time, not as an exact clinical measurement.</p>
+    <p class="disclaimer">This is a fun, approximate browser-based test — not a scientific or medical instrument. Your measured time includes your device's screen refresh rate, input latency, and browser/OS rendering delay, which can add roughly 20–80ms on top of your true reaction time. The percentile above compares you against a model built from published reaction-time research and one large public web dataset, all cited on the <a href="/reaction-time-percentiles/">percentile reference page</a> — it is not a ranking against other people who have used this site, because no results are ever collected here.</p>
   </section>
 
   <section class="panel panel-narrow" id="history-panel">
@@ -177,7 +183,7 @@
 
     <div class="faq-item">
       <h3>What's a good reaction time?</h3>
-      <p>For simple visual reaction time, most healthy adults land somewhere between about 200 and 300 milliseconds. Under 200ms is unusually fast for a browser-based test (and may include some clicks that were a little anticipatory rather than purely reactive). Times creeping past 350ms are still completely normal — reaction time varies a lot based on tiredness, age, screen refresh rate, and how much coffee you've had.</p>
+      <p>For simple visual reaction time, most healthy adults land somewhere between about 200 and 300 milliseconds. Under 200ms is unusually fast for a browser-based test (and may include some clicks that were a little anticipatory rather than purely reactive). Times creeping past 350ms are still completely normal — reaction time varies a lot based on tiredness, age, screen refresh rate, and how much coffee you've had. The <a href="/reaction-time-percentiles/">reaction time percentiles page</a> has the full distribution, age bands, and the studies each figure comes from.</p>
     </div>
 
     <div class="faq-item">
@@ -204,6 +210,10 @@
   <section class="container-narrow" id="articles" style="padding-top:0;">
     <h2 style="margin-top:0;">Learn more about reaction time</h2>
     <div class="faq-item">
+      <h3><a href="/reaction-time-percentiles/">Reaction Time Percentiles: The Full Distribution, by Age</a></h3>
+      <p>The percentile table behind your result, where each figure comes from, and how much of your score is your screen rather than you.</p>
+    </div>
+    <div class="faq-item">
       <h3><a href="/articles/history-of-reaction-time.html">The History of Reaction Time Measurement</a></h3>
       <p>From a fired astronomer's assistant in 1796 to Helmholtz, Donders, and the test in your browser.</p>
     </div>
@@ -226,6 +236,7 @@
   <div class="footer-inner">
     <div>© <span id="year"></span> reflexzap.com</div>
     <div class="footer-links">
+      <a href="/reaction-time-percentiles/">Percentiles</a>
       <a href="/privacy.html">Privacy</a>
       <a href="/terms.html">Terms</a>
     </div>
@@ -238,6 +249,7 @@
 <div class="toast" id="toast">Copied!</div>
 <div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
 
-<script src="/assets/js/app.js?v=3"></script>
+<script src="/assets/js/percentile.js?v=4"></script>
+<script src="/assets/js/app.js?v=4"></script>
 </body>
 </html>
