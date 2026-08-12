@@ -13,8 +13,15 @@ Cloudflare DNS). Everything runs client-side; nothing is uploaded.
   for Node tests), then one IIFE with the gamification layer (XP/levels/ranks/
   achievements/streaks), WebAudio sound synth, the round state machine, and the
   arcade HUD.
+- `assets/js/percentile.js` — the cited percentile engine (see below). Loaded
+  **before** `app.js`; DOM-free and `require()`-able.
 - `assets/css/styles.css` — the whole design system, one file.
+- `reaction-time-percentiles/index.html` + `reaction-time-percentiles.html` —
+  the percentile reference page, shipped at the clean path with a flat alias
+  (identical content, canonical on both points at `/reaction-time-percentiles/`).
 - `privacy.html` / `terms.html` — required for ad networks; keep working.
+- `test/percentile.test.js` — `node --test 'test/*.test.js'`. No package.json,
+  no dependencies.
 
 No `?v=` cache-bust convention (GitHub Pages `max-age=600`).
 
@@ -141,4 +148,25 @@ reflexzap was rebuilt from the "web-slick" arcade pass into a genuine
   never touches timing.
 - **Cache-bust adopted**: `styles.css?v=` / `app.js?v=` on every page. **Bump
   the `?v=` on any coupled HTML+CSS/JS change** or cached visitors get new HTML
-  with stale CSS (this exact bug hit cpsboost). Currently `?v=3`.
+  with stale CSS (this exact bug hit cpsboost). Currently `?v=4`.
+
+## The percentile engine (`assets/js/percentile.js`) — read before touching
+
+The percentiles are a **model fitted to published figures**, every one cited in
+the `SOURCES` block of that file. They are **not** this site's visitor data —
+there is no backend and nothing leaves the device, so we cannot have any.
+
+- Copy must read "**the population in published studies**", never "other
+  visitors / other players / people who took this test". `test/percentile.test.js`
+  greps every shipped `.html`/`.js` for that class of phrasing and fails the
+  build if it appears. Mislabelled, this is fabricated statistics — a trust
+  problem and an AdSense-policy problem, not a wording nit.
+- If a number can't be traced to a source in that file, it does not ship.
+- The distribution is a two-parameter lognormal derived from a cited mean and
+  SD, so there are **no free/unsourced parameters** in the fit. Keep it that way.
+- Everything above the "SITE-SPECIFIC POPULATION MODEL" heading is generic and
+  unit-agnostic (`lowerIsBetter` flips the direction). It is meant to drop into
+  cpsboost / wpmflex / flicktrainer / chimpmemory with only the model replaced.
+- The reference page's table is static HTML for SEO; a test asserts it still
+  matches what the module computes, so **re-run the tests after changing the
+  model** and update the page if they fail.

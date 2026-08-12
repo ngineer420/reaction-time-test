@@ -24,30 +24,30 @@ function getRatingLabel(avgMs) {
   return "Below Average — try again!";
 }
 
+/* Band descriptions only. The one comparative claim on this screen is the
+   percentile below, which comes from the cited model in percentile.js — these
+   notes must never make a competing "faster than N people" claim of their own. */
 const RATING_NOTES = {
-  "Superhuman": "That's faster than nearly all recorded human visual reaction times — enjoy the bragging rights (or try again to confirm it wasn't an early click).",
-  "Excellent": "Well above typical human reaction speed. Nicely done.",
-  "Above Average": "Faster than most people's average reaction time.",
-  "Average": "Right in the typical human range of roughly 200–300ms.",
+  "Superhuman": "Under 200ms on a browser test is exceptional — worth a second run to confirm it wasn't an early click.",
+  "Excellent": "Inside the 200–250ms band, which is quick for a test running through a browser and a monitor.",
+  "Above Average": "Inside the 250–300ms band — the range most healthy adults land in on a browser test.",
+  "Average": "Inside the 300–350ms band. Screen refresh rate and input lag alone account for a chunk of this.",
   "Below Average — try again!": "On the slower side today — fatigue, distraction, or device input lag can all add extra milliseconds.",
 };
 
-/* Rough, illustrative percentile bands mapped onto the existing rating tiers above.
-   Not derived from a real population study — just a fun approximation so results feel
-   meaningful at a glance, paired with the disclaimer already shown on the results panel. */
-const RATING_PERCENTILE = {
-  "Superhuman": 99,
-  "Excellent": 90,
-  "Above Average": 70,
-  "Average": 40,
-  "Below Average — try again!": 15,
-};
+/* Percentiles come from assets/js/percentile.js — a model fitted to figures
+   published in the literature, every one of them cited in that file. They are
+   NOT this site's own visitor data (there is no backend to aggregate one), and
+   nothing rendered from them may imply otherwise. percentile.js is loaded ahead
+   of this script in the page; under Node it is require()d so these helpers stay
+   unit-testable. */
+const PERCENTILE =
+  (typeof globalThis !== "undefined" && globalThis.PercentileEngine) ||
+  (typeof require === "function" ? require("./percentile.js") : null);
 
 function getPercentileNote(avgMs) {
-  const label = getRatingLabel(avgMs);
-  const pct = RATING_PERCENTILE[label];
-  if (!Number.isFinite(pct)) return "";
-  return `Faster than about ${pct}% of people tested.`;
+  if (!PERCENTILE || !Number.isFinite(avgMs)) return "";
+  return PERCENTILE.comparisonText(avgMs, PERCENTILE.REACTION_TIME_MS);
 }
 
 if (typeof module !== "undefined" && module.exports) {
@@ -56,7 +56,6 @@ if (typeof module !== "undefined" && module.exports) {
     computeBest,
     getRatingLabel,
     RATING_NOTES,
-    RATING_PERCENTILE,
     getPercentileNote,
   };
 }
@@ -409,6 +408,8 @@ if (typeof module !== "undefined" && module.exports) {
   const resultAllTimeBestEl = document.getElementById("result-alltime-best");
   const roundsTbody = document.getElementById("rounds-tbody");
   const roundsChart = document.getElementById("rounds-chart");
+  const distCard = document.getElementById("dist-card");
+  const distChart = document.getElementById("dist-chart");
   const retryBtn = document.getElementById("retry-btn");
   const copyBtn = document.getElementById("copy-btn");
 
@@ -716,6 +717,61 @@ if (typeof module !== "undefined" && module.exports) {
       .join("");
 
     renderChart(roundTimes, avg, best);
+    renderDistribution(avg);
+  }
+
+  // Draws the published-literature distribution with the visitor's average
+  // marked on it. The curve is a model of figures from the studies cited in
+  // percentile.js — never an aggregate of anyone's results on this site, and
+  // the caption below it says so.
+  function renderDistribution(avg) {
+    if (!distChart || !distCard) return;
+    if (!PERCENTILE || !Number.isFinite(avg)) {
+      distCard.hidden = true;
+      return;
+    }
+    const model = PERCENTILE.REACTION_TIME_MS;
+    const geom = {
+      width: 320, height: 136,
+      padTop: 30, padBottom: 26, padLeft: 10, padRight: 10,
+      samples: 36, step: true,
+    };
+
+    const areaAll = PERCENTILE.distributionPath(model, Object.assign({ close: true }, geom));
+    const outline = PERCENTILE.distributionPath(model, geom);
+    const range = PERCENTILE.beatenRange(model, avg, geom);
+    const areaBeaten = PERCENTILE.distributionPath(
+      model, Object.assign({ close: true }, geom, range)
+    );
+    const marker = PERCENTILE.projectScore(model, avg, geom);
+    const pct = PERCENTILE.formatPercentile(PERCENTILE.percentileForScore(avg, model));
+
+    const ticks = PERCENTILE.axisTicks(model, geom, 4)
+      .map((t) =>
+        `<line x1="${t.x.toFixed(1)}" y1="${marker.baseline}" x2="${t.x.toFixed(1)}" y2="${marker.baseline + 4}" class="dist-tick-mark" />` +
+        `<text x="${t.x.toFixed(1)}" y="${geom.height - 8}" class="dist-tick" text-anchor="middle">${t.score}</text>`
+      )
+      .join("");
+
+    // Keep the marker's label inside the box at both extremes of the domain.
+    const anchor = marker.x < 50 ? "start" : marker.x > geom.width - 50 ? "end" : "middle";
+    const labelX = anchor === "start" ? geom.padLeft : anchor === "end" ? geom.width - geom.padRight : marker.x;
+
+    distCard.hidden = false;
+    distChart.innerHTML =
+      `<svg viewBox="0 0 ${geom.width} ${geom.height}" class="dist-svg" role="img" ` +
+      `aria-label="Modelled distribution of simple visual reaction times from published studies. ` +
+      `Your ${avg} millisecond average is faster than ${pct}% of that modelled population.">` +
+      `<path class="dist-area" d="${areaAll}" />` +
+      `<path class="dist-area dist-area--beaten" d="${areaBeaten}" />` +
+      `<path class="dist-curve" d="${outline}" />` +
+      `<line x1="${geom.padLeft}" y1="${marker.baseline}" x2="${geom.width - geom.padRight}" y2="${marker.baseline}" class="dist-baseline" />` +
+      ticks +
+      `<line x1="${marker.x.toFixed(1)}" y1="${marker.baseline}" x2="${marker.x.toFixed(1)}" y2="${geom.padTop - 8}" class="dist-marker" />` +
+      `<rect x="${(marker.x - 4).toFixed(1)}" y="${(marker.y - 4).toFixed(1)}" width="8" height="8" class="dist-marker-pip" />` +
+      `<text x="${labelX.toFixed(1)}" y="${geom.padTop - 14}" class="dist-marker-label" text-anchor="${anchor}">You · ${avg}ms</text>` +
+      `<text x="${geom.width - geom.padRight}" y="${(marker.baseline - 6).toFixed(1)}" class="dist-band-label" text-anchor="end">slower →</text>` +
+      `</svg>`;
   }
 
   // Simple SVG bar chart: one bar per round, height scaled to its ms value,
