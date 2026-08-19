@@ -1624,6 +1624,33 @@ table.rounds-table caption:not(.visually-hidden) {
 }
 .latency-tile .lt-note { font-size: 12px; color: var(--text-dim); margin-top: 6px; line-height: 1.5; }
 
+/* ---- /audio-vs-visual-reaction-time/ ---- */
+/* An intro paragraph that carries the answer, set one step up from body text so
+   the page states its case before the first heading. */
+.lede { font-size: 16px; line-height: 1.65; color: var(--text); }
+/* Count chip on the completion prompt — "2 of 4 tests done". */
+.pill {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 3px 9px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--bg);
+  background: var(--accent);
+  vertical-align: middle;
+}
+/* A test already taken reads as filled-in; an empty slot is the call to action,
+   so it keeps the plain tile and the accent lives on its link instead. */
+.latency-tile.is-done { border-color: var(--accent); }
+.latency-tile .lt-value a { color: var(--accent); text-decoration: none; }
+.latency-tile .lt-value a:hover { text-decoration: underline; }
+#your-gap .gap-head { font-size: 15px; color: var(--text); margin: 0 0 8px; }
+#your-gap .gap-head strong { font-family: var(--mono); font-size: 21px; color: var(--accent); }
+#your-gap p { margin: 0 0 8px; }
+#your-gap p:last-child { margin-bottom: 0; }
+#your-gap .gap-caveat { color: var(--text-faint); }
+
 /* The erabb.it mark is a link but must not advertise itself as one — the
    pointing-hand cursor is exactly what gives it away on hover. */
 .erabbit-mark { cursor: default; }

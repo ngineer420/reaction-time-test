@@ -384,6 +384,75 @@
     },
   ];
 
+  /* ===================== MECHANISM SOURCES =====================
+     Kept separate from SOURCES above, and deliberately so. SOURCES is the
+     provenance of the MODEL — every figure the percentile engine is fitted to.
+     Nothing below feeds a parameter; these are the physiology behind *why* the
+     auditory model sits left of the visual one, cited on
+     /audio-vs-visual-reaction-time/. Separating them keeps the rule at the top
+     of this file exact ("if a number cannot be traced to a source below, it does
+     not belong here") without forcing the percentile reference page to carry
+     citations that explain nothing about its own table. A test asserts the
+     mechanism page cites every entry here, the same way one asserts the
+     reference page cites every entry above. */
+
+  var MECHANISM_SOURCES = [
+    {
+      id: "corey1979",
+      citation:
+        "Corey DP, Hudspeth AJ (1979). Response latency of vertebrate hair cells. " +
+        "Biophysical Journal 26(3):499-506.",
+      url: "https://doi.org/10.1016/S0006-3495(79)85267-4",
+      kind: "peer-reviewed",
+      used:
+        "Bullfrog saccular hair cells, in vitro. Corrected for the electrical time " +
+        "constant of the epithelium, the transepithelial microphonic response follows a " +
+        "fast mechanical stimulus with a 40-microsecond delay at 22 degrees C. The " +
+        "authors note that the short latency and its modest temperature dependence " +
+        "limit the possible models for hair-cell transduction — i.e. it is too fast to " +
+        "be an enzymatic cascade.",
+    },
+    {
+      id: "schnapf1990",
+      citation:
+        "Schnapf JL, Nunn BJ, Meister M, Baylor DA (1990). Visual transduction in cones " +
+        "of the monkey Macaca fascicularis. Journal of Physiology 427:681-713.",
+      url: "https://doi.org/10.1113/jphysiol.1990.sp018193",
+      kind: "peer-reviewed",
+      used:
+        "Membrane current of single primate cone outer segments. The response to a brief " +
+        "flash is diphasic and resembles the output of a bandpass filter with a peak " +
+        "frequency near 5 Hz — that is, the photocurrent takes tens of milliseconds to " +
+        "rise and fall, not microseconds.",
+    },
+    {
+      id: "jewett1971",
+      citation:
+        "Jewett DL, Williston JS (1971). Auditory-evoked far fields averaged from the " +
+        "scalp of humans. Brain 94(4):681-696.",
+      url: "https://doi.org/10.1093/brain/94.4.681",
+      kind: "peer-reviewed",
+      used:
+        "The paper that established the auditory brainstem response: far-field potentials " +
+        "averaged from the human scalp, whose series of waves runs its course within " +
+        "roughly the first ten milliseconds after a click.",
+    },
+    {
+      id: "iscev2016",
+      citation:
+        "Odom JV, Bach M, Brigell M, Holder GE, McCulloch DL, Mizota A, Tormene AP; " +
+        "International Society for Clinical Electrophysiology of Vision (2016). ISCEV " +
+        "standard for clinical visual evoked potentials: (2016 update). Documenta " +
+        "Ophthalmologica 133(1):1-9.",
+      url: "https://doi.org/10.1007/s10633-016-9553-y",
+      kind: "clinical standard",
+      used:
+        "The clinical standard for pattern-reversal visual evoked potentials, whose " +
+        "principal component is named P100 for the positive peak that lands near 100 ms " +
+        "after the reversal.",
+    },
+  ];
+
   /* ===================== SITE-SPECIFIC POPULATION MODEL ===================== */
 
   /* HOW THIS MODEL WAS BUILT — the whole derivation, so every number is checkable.
@@ -673,6 +742,7 @@
     lognormalParams: lognormalParams,
     // site data
     SOURCES: SOURCES,
+    MECHANISM_SOURCES: MECHANISM_SOURCES,
     MODELS: MODELS,
     REACTION_TIME_MS: REACTION_TIME_MS,
     AUDIO_REACTION_TIME_MS: AUDIO_REACTION_TIME_MS,
