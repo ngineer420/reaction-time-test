@@ -329,3 +329,241 @@ test("no shipped file claims the percentiles come from this site's visitors", ()
     }
   }
 });
+
+/* ==================================================================
+   THE THREE SIBLING TESTS — audio, go/no-go, F1 lights-out.
+   Everything above was written when this site had one distribution. It
+   now has four, and every guarantee the visual model gets has to hold
+   for the other three or they are not the same kind of object.
+   ================================================================== */
+
+const SIBLINGS = [
+  { slug: "audio-reaction-time-test", mode: "audio", model: P.AUDIO_REACTION_TIME_MS },
+  { slug: "choice-reaction-time-test", mode: "choice", model: P.CHOICE_REACTION_TIME_MS },
+  { slug: "f1-reaction-test", mode: "f1", model: P.F1_REACTION_TIME_MS },
+];
+
+test("every model is registered, unique and complete", () => {
+  assert.strictEqual(P.MODELS.length, 4, "four tests, four models");
+  const ids = new Set(P.MODELS.map((m) => m.id));
+  assert.strictEqual(ids.size, 4, "model ids must be unique");
+  const sourceIds = new Set(P.SOURCES.map((s) => s.id));
+  for (const m of P.MODELS) {
+    assert.ok(m.label && m.unit && m.betterWord && m.populationPhrase, `${m.id} is missing display copy`);
+    assert.ok(sourceIds.has(m.source), `${m.id} cites unknown source ${m.source}`);
+    assert.ok(Number.isFinite(m.sd) && m.sd > 0, `${m.id} has no usable spread`);
+    assert.ok(Number.isFinite(m.median) || Number.isFinite(m.mean), `${m.id} has no anchor`);
+    assert.ok(Array.isArray(m.domain) && m.domain[1] > m.domain[0], `${m.id} has no drawing domain`);
+    assert.match(m.populationPhrase, /published/i, `${m.id} must name its source class`);
+  }
+});
+
+test("every model is bounded and monotone, not just the visual one", () => {
+  for (const m of P.MODELS) {
+    let prev = -Infinity;
+    for (let ms = 4000; ms >= 1; ms -= 0.5) {
+      const p = P.percentileForScore(ms, m);
+      assert.ok(Number.isFinite(p) && p >= 0 && p <= 100, `${m.id} out of bounds at ${ms}ms: ${p}`);
+      assert.ok(p >= prev, `${m.id} percentile dropped when improving to ${ms}ms`);
+      prev = p;
+    }
+  }
+});
+
+test("every model reproduces the published figures it is pinned to", () => {
+  for (const m of P.MODELS) {
+    let m0 = 0, m1 = 0, m2 = 0;
+    for (let x = 1; x < 4000; x += 0.05) {
+      const d = P.density(m, x);
+      m0 += d; m1 += d * x; m2 += d * x * x;
+    }
+    const mean = m1 / m0;
+    const sd = Math.sqrt(m2 / m0 - mean * mean);
+    assert.ok(Math.abs(sd - m.sd) < 0.5, `${m.id} fitted SD ${sd.toFixed(2)} != cited ${m.sd}`);
+    if (m.median != null) {
+      assert.ok(Math.abs(P.scoreForPercentile(50, m) - m.median) < 0.5, `${m.id} median drifted`);
+    } else {
+      assert.ok(Math.abs(mean - m.mean) < 0.5, `${m.id} fitted mean ${mean.toFixed(2)} != cited ${m.mean}`);
+    }
+    assert.ok(mean > P.scoreForPercentile(50, m), `${m.id} must stay right-skewed`);
+  }
+});
+
+test("every model's quantile table matches the model it claims to come from", () => {
+  for (const m of P.MODELS) {
+    assert.ok(Array.isArray(m.quantiles) && m.quantiles.length > 0, `${m.id} has no table`);
+    for (const row of m.quantiles) {
+      const actual = P.percentileForScore(row.ms, m);
+      assert.ok(
+        Math.abs(actual - row.percentile) <= 1,
+        `${m.id} row p${row.percentile} = ${row.ms}ms actually maps to p${actual.toFixed(2)}`
+      );
+    }
+    for (let i = 1; i < m.quantiles.length; i++) {
+      assert.ok(m.quantiles[i].percentile < m.quantiles[i - 1].percentile, `${m.id} percentiles must descend`);
+      assert.ok(m.quantiles[i].ms > m.quantiles[i - 1].ms, `${m.id} milliseconds must ascend`);
+    }
+  }
+});
+
+test("the sibling models say something different from the visual one", () => {
+  // Audio has to be faster and go/no-go slower, or the models are decoration.
+  const at50 = (m) => P.scoreForPercentile(50, m);
+  assert.ok(at50(P.AUDIO_REACTION_TIME_MS) < at50(P.REACTION_TIME_MS) - 10,
+    "the auditory advantage must actually move the distribution");
+  assert.ok(at50(P.CHOICE_REACTION_TIME_MS) > at50(P.REACTION_TIME_MS) + 100,
+    "a go/no-go decision must cost real milliseconds");
+  // F1 deliberately shares the visual model's parameters — see percentile.js.
+  assert.strictEqual(P.F1_REACTION_TIME_MS.median, P.REACTION_TIME_MS.median);
+  assert.strictEqual(P.F1_REACTION_TIME_MS.sd, P.REACTION_TIME_MS.sd);
+});
+
+test("the percentile reference page carries a row for every model", () => {
+  for (const m of P.MODELS) {
+    const cells = [90, 75, 50, 25, 10]
+      .map((p) => `<td class="num">${m.quantiles.find((q) => q.percentile === p).ms}ms</td>`)
+      .join("");
+    assert.ok(pageHtml.includes(cells), `the reference page has no quantile row for ${m.id}`);
+  }
+  // ...and states each model's own parameters, not just the visual model's.
+  assert.ok(pageHtml.includes("median 253ms"), "audio model parameters missing");
+  assert.ok(pageHtml.includes("mean 441ms"), "go/no-go model parameters missing");
+  for (const m of P.MODELS) {
+    assert.ok(pageHtml.includes(`<strong>${m.sd}ms</strong>`), `${m.id} spread not stated on the page`);
+  }
+});
+
+/* -------------------- the three shipped page pairs -------------------- */
+
+for (const sib of SIBLINGS) {
+  const clean = path.join(REPO, sib.slug, "index.html");
+  const flat = path.join(REPO, `${sib.slug}.html`);
+
+  test(`/${sib.slug}/ ships as an identical flat/clean pair`, () => {
+    const html = fs.readFileSync(clean, "utf8");
+    assert.strictEqual(fs.readFileSync(flat, "utf8"), html, "the flat alias has drifted");
+    assert.ok(
+      html.includes(`<link rel="canonical" href="https://reflexzap.com/${sib.slug}/">`),
+      "canonical must point at the clean path"
+    );
+  });
+
+  test(`/${sib.slug}/ selects its own engine and model`, () => {
+    const html = fs.readFileSync(clean, "utf8");
+    assert.ok(html.includes(`<body data-mode="${sib.mode}">`), "the page must select its stimulus");
+    // Mis-set data-mode is the one failure that silently scores a visitor
+    // against another test's distribution, so it gets its own assertion.
+    const otherModes = SIBLINGS.filter((s) => s !== sib).map((s) => s.mode);
+    for (const other of otherModes) {
+      assert.ok(!html.includes(`data-mode="${other}"`), `page also claims mode ${other}`);
+    }
+  });
+
+  test(`/${sib.slug}/ carries the portfolio furniture`, () => {
+    const html = fs.readFileSync(clean, "utf8");
+    const adTags = html.match(/adsbygoogle\.js\?client=ca-pub-7560786263587509/g) || [];
+    assert.strictEqual(adTags.length, 1, "exactly one Auto-ads script tag");
+    assert.ok(!/class="[^"]*ad-slot/.test(html), "no manually placed ad units");
+    assert.match(html, /<\/footer>\s*(<script[^>]*>[^<]*<\/script>\s*)*<a href="https:\/\/erabb\.it" class="erabbit-mark"/);
+    assert.match(html, /erabbit-mark[\s\S]*?<\/a>\s*[\s\S]*?<\/body>/, "the mark must be body-level after the footer");
+    assert.ok(html.includes('aria-current="page"'), "the active nav link must be marked");
+    assert.ok(/<h1>[^<]+<\/h1>/.test(html), "every page needs its own h1");
+    assert.ok(html.includes("<!-- nav:start -->"), "the toolbar region must be present");
+  });
+
+  test(`/${sib.slug}/ makes no external requests`, () => {
+    const html = fs.readFileSync(clean, "utf8");
+    const external = [...html.matchAll(/(?:src|href)="(https?:\/\/[^"]+)"/g)]
+      .map((m) => m[1])
+      .filter((u) => !u.startsWith("https://reflexzap.com/"))
+      .filter((u) => !u.startsWith("https://pagead2.googlesyndication.com/"))
+      .filter((u) => !/^https?:\/\/(doi\.org|humanbenchmark\.com|erabb\.it|schema\.org|www\.fia\.com|worldathletics\.org)/.test(u));
+    assert.deepStrictEqual(external, [], "unexpected external resource");
+    assert.ok(!/<link[^>]+fonts\./.test(html), "no web fonts");
+  });
+
+  test(`/${sib.slug}/ is listed in the sitemap`, () => {
+    const sitemap = fs.readFileSync(path.join(REPO, "sitemap.xml"), "utf8");
+    assert.ok(
+      sitemap.includes(`<loc>https://reflexzap.com/${sib.slug}/</loc>`),
+      "the clean path must be in the sitemap"
+    );
+    assert.ok(
+      !sitemap.includes(`${sib.slug}.html`),
+      "the flat alias must not be listed separately — it is not a second URL"
+    );
+  });
+}
+
+test("every page is unique in the ways a search engine reads", () => {
+  const pages = ["index.html", "reaction-time-percentiles/index.html"]
+    .concat(SIBLINGS.map((s) => `${s.slug}/index.html`));
+  const seen = { title: new Map(), description: new Map(), canonical: new Map() };
+  for (const rel of pages) {
+    const html = fs.readFileSync(path.join(REPO, rel), "utf8");
+    const grab = {
+      title: (html.match(/<title>([^<]+)<\/title>/) || [])[1],
+      description: (html.match(/<meta name="description" content="([^"]+)"/) || [])[1],
+      canonical: (html.match(/<link rel="canonical" href="([^"]+)"/) || [])[1],
+    };
+    for (const key of Object.keys(seen)) {
+      assert.ok(grab[key], `${rel} has no ${key}`);
+      assert.ok(!seen[key].has(grab[key]), `${rel} duplicates the ${key} of ${seen[key].get(grab[key])}`);
+      seen[key].set(grab[key], rel);
+    }
+  }
+});
+
+/* ======================= honesty guards, part two ======================= */
+
+test("the go/no-go error rate is never quoted without the task it belongs to", () => {
+  // 8.23% is a property of a task, not of a person: it moves with the no-go
+  // proportion and the pacing. Printed bare, it reads as a benchmark a visitor
+  // can compare their own false-start count against, and it is not one.
+  for (const file of shippedFiles()) {
+    const text = fs.readFileSync(file, "utf8");
+    if (!text.includes("8.23")) continue;
+    const rel = path.relative(REPO, file);
+    assert.ok(/500\s*ms|500 ms/.test(text), `${rel} quotes 8.23% without the stimulus duration`);
+    assert.ok(/1250/.test(text), `${rel} quotes 8.23% without the inter-stimulus interval`);
+  }
+});
+
+test("no page invents an F1 reaction time threshold or record", () => {
+  // These match a figure being ASSERTED, not the subject being discussed — the
+  // F1 page exists partly to say that no such number is published, so it has to
+  // be able to name the thing it is refusing to quote.
+  const banned = [
+    /(F1|Formula 1)[^.]{0,80}(reaction time|reaction)[^.]{0,20}(threshold|limit)[^.]{0,20}(of|is)\s*0?\.?\d/i,
+    /(fastest|record)[^.]{0,60}(F1|Formula 1)[^.]{0,60}reaction[^.]{0,40}\d{2,3}\s*(ms|millisecond)/i,
+    /jump start if[^.]{0,40}(faster|less) than 0\.\d/i,
+  ];
+  for (const file of shippedFiles()) {
+    const text = fs.readFileSync(file, "utf8");
+    for (const pattern of banned) {
+      assert.ok(!pattern.test(text), `${path.relative(REPO, file)} invents an F1 figure: ${pattern}`);
+    }
+  }
+});
+
+test("the generated test pages have not been hand-edited", () => {
+  // tools/build_tests.py owns those six files. A hand-edit to one member of a
+  // pair is exactly how the two halves drift apart, and the drift is invisible.
+  const { spawnSync } = require("node:child_process");
+  const run = spawnSync("python3", ["tools/build_tests.py", "--check"], { cwd: REPO, encoding: "utf8" });
+  if (run.error) return; // no python3 here; the pair-identity tests still cover the worst case
+  assert.strictEqual(run.status, 0, `build_tests.py --check failed:\n${run.stderr}`);
+});
+
+function shippedFiles() {
+  const out = [];
+  (function walk(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name === ".git" || entry.name === ".worktrees" || entry.name === "node_modules") continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (/\.(html|js)$/.test(entry.name)) out.push(full);
+    }
+  })(REPO);
+  return out;
+}

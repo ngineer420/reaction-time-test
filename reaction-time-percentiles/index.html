@@ -19,7 +19,7 @@
 <meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
 
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/styles.css?v=5">
+<link rel="stylesheet" href="/assets/css/styles.css?v=6">
 <script>try{var t=localStorage.getItem("reflexzap_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 
 <script type="application/ld+json">
@@ -51,35 +51,48 @@
 <!-- nav:start -->
 <nav class="toolbar" aria-label="Tools">
   <details class="tb-menu">
-    <summary class="tb-trigger" aria-label="All 5 guides">
+    <summary class="tb-trigger" aria-label="All 9 tests &amp; guides">
       <span class="tb-glyph" aria-hidden="true">&#9636;</span>
-      <span class="tb-label">All 5<span class="tb-label-long"> guides</span></span>
+      <span class="tb-label">All 9<span class="tb-label-long"> tests &amp; guides</span></span>
     </summary>
-    <div class="tb-sheet is-flat">
-      <ul>
+    <div class="tb-sheet">
+      <p class="tb-grouplabel" id="tb-g1">Tests</p>
+      <ul aria-labelledby="tb-g1">
+        <li><a href="/">Visual Reaction Time Test</a></li>
+        <li><a href="/audio-reaction-time-test/">Audio Reaction Time Test</a></li>
+        <li><a href="/choice-reaction-time-test/">Go / No-Go Reaction Test</a></li>
+        <li><a href="/f1-reaction-test/">F1 Lights-Out Reaction Test</a></li>
+      </ul>
+      <p class="tb-grouplabel" id="tb-g2">Your score</p>
+      <ul aria-labelledby="tb-g2">
         <li><a href="/reaction-time-percentiles/" aria-current="page">Reaction Time Percentiles</a></li>
         <li><a href="/articles/reaction-time-in-gaming.html">Reaction Time in Gaming</a></li>
         <li><a href="/articles/what-affects-reaction-time.html">What Affects Your Reaction Time</a></li>
+      </ul>
+      <p class="tb-grouplabel" id="tb-g3">How it is measured</p>
+      <ul aria-labelledby="tb-g3">
         <li><a href="/articles/how-this-test-works.html">How This Test Works</a></li>
         <li><a href="/articles/history-of-reaction-time.html">History of Reaction Time</a></li>
       </ul>
-      <p class="tb-hub"><a href="/">Take the reaction time test →</a></p>
     </div>
   </details>
   <div class="tb-scrim"></div>
   <ul class="tb-rail">
+    <li><a href="/">Visual</a></li>
+    <li><a href="/audio-reaction-time-test/">Audio</a></li>
+    <li><a href="/choice-reaction-time-test/">Go / No-Go</a></li>
+    <li><a href="/f1-reaction-test/">F1 Lights</a></li>
     <li><a href="/reaction-time-percentiles/" aria-current="page">Percentiles</a></li>
     <li><a href="/articles/reaction-time-in-gaming.html">Gaming</a></li>
     <li><a href="/articles/what-affects-reaction-time.html">What Affects It</a></li>
     <li><a href="/articles/how-this-test-works.html">How It Works</a></li>
-    <li><a href="/articles/history-of-reaction-time.html">History</a></li>
   </ul>
 </nav>
 <!-- nav:end -->
 <main id="main" class="container-narrow">
   <h1>Reaction Time Percentiles: What Your Score Actually Means</h1>
 
-  <p>"Is 250ms good?" is the question every reaction time test creates and almost none of them answer. This page answers it with a percentile table for <strong>simple visual reaction time</strong> — the exact thing <a href="/">the test on this site</a> measures — and shows where every number in it came from.</p>
+  <p>"Is 250ms good?" is the question every reaction time test creates and almost none of them answer. This page answers it with a percentile table for <strong>simple visual reaction time</strong> — the exact thing <a href="/">the main test on this site</a> measures — and shows where every number in it came from. The <a href="#other-tests">three sibling tests</a> measure different things and get their own distributions further down.</p>
 
   <div class="callout">
     <strong>Where these numbers come from.</strong> They are a model fitted to figures published in the scientific literature and in one large public web dataset, all cited at the <a href="#sources">bottom of this page</a>. They are <strong>not</strong> a record of scores on this site. ReflexZap has no backend and no database: your results are held in your own browser and are never uploaded, so there is nothing here to aggregate. Any site that claims to rank you against "other visitors" without an account system is telling you a story.
@@ -159,6 +172,36 @@
   <p>The <strong>lab mean</strong> column is printed exactly as published. The <strong>typical browser test</strong> column adds 42ms to each — the gap between that study's overall mean of 231ms and the 273ms median of the 81-million-click browser dataset also cited below. It is an adjustment, not a measurement, and it is there so you can compare your own browser score against your age band without being misled by a number collected on laboratory equipment.</p>
   <p>Two things worth noticing. The change across a lifetime is real but small — about 21ms separates the youngest band from the oldest, which is less than the difference a 60Hz monitor makes on its own. And the spread <em>within</em> each band grows with age (the published standard deviations run from 19.5ms in the youngest band to 28.1ms in the oldest), so age predicts variability better than it predicts speed.</p>
 
+  <h2 id="other-tests">The other three tests</h2>
+  <p>The table above is for <a href="/">simple visual reaction time</a> and nothing else. This site runs three more tests, and each of them measures a genuinely different thing against its own published distribution &mdash; the same rule applies throughout: two cited numbers per model, no free parameters, and no figure that traces back to anyone's score on this site.</p>
+
+  <div class="table-scroll">
+    <table class="rounds-table">
+      <caption>Median and quartiles for all four tests, modelled from the sources below</caption>
+      <thead><tr><th>Test</th><th class="num">Top 10%</th><th class="num">Top 25%</th><th class="num">Median</th><th class="num">Bottom 25%</th><th class="num">Bottom 10%</th></tr></thead>
+      <tbody>
+        <tr class="is-you"><td><a href="/">Visual</a></td><td class="num">229ms</td><td class="num">249ms</td><td class="num">273ms</td><td class="num">299ms</td><td class="num">325ms</td></tr>
+        <tr><td><a href="/audio-reaction-time-test/">Audio</a></td><td class="num">213ms</td><td class="num">231ms</td><td class="num">253ms</td><td class="num">277ms</td><td class="num">300ms</td></tr>
+        <tr><td><a href="/choice-reaction-time-test/">Go / no-go</a></td><td class="num">367ms</td><td class="num">399ms</td><td class="num">437ms</td><td class="num">479ms</td><td class="num">520ms</td></tr>
+        <tr><td><a href="/f1-reaction-test/">F1 lights-out</a></td><td class="num">229ms</td><td class="num">249ms</td><td class="num">273ms</td><td class="num">299ms</td><td class="num">325ms</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Audio &mdash; median 253ms, spread <strong>34ms</strong></h3>
+  <p>Anchored by shifting the visual model rather than by importing a laboratory mean, because the useful part of the auditory literature is the <em>contrast</em> between the two stimuli, not their absolute levels. Jain and colleagues measured both in the same 120 subjects on the same apparatus: visual 247.60ms (SD 18.54) against auditory 228.01ms (SD 16.49). The auditory advantage of <strong>19.6ms</strong> comes off the 273ms visual median, and that study's SD ratio (16.49 &divide; 18.54) scales the 38ms spread down to 34ms.</p>
+  <p>Their scoring rule is worth knowing: each subject's figure is the <em>fastest of five readings</em>, not a mean, so those absolute numbers sit lower than a mean-based measurement would. That is exactly why only the difference and the ratio are borrowed. And it is why this page quotes around twenty milliseconds rather than the forty-plus you will see elsewhere &mdash; the larger figures come from comparing separate studies run on separate equipment, which measures the equipment too.</p>
+
+  <h3>Go / no-go &mdash; mean 441ms, spread <strong>60ms</strong></h3>
+  <p>Schulz and colleagues measured the non-emotional green-go / red-no-go task in 85 participants: mean go reaction time 362ms (SD 57). That is a laboratory figure, so it needs converting before a browser score is set beside it, and the conversion is stated rather than absorbed: <strong>362 + 78.81 = 441ms</strong>, where 78.81ms is Anwyl-Irvine's robot-measured mean Chrome response lag. The spread combines the study's 57ms between-subject SD with the 18.51ms between-machine SD of that lag, in quadrature, giving 60ms.</p>
+  <p>This is deliberately a larger correction than the <strong>42ms</strong> the age-band table above applies, and the two are not interchangeable. 42ms is the gap between one lab study's mean and one web dataset's median, so it carries the difference between two <em>populations</em> as well as two sets of equipment. 78.81ms is a hardware-and-software lag with no population in it, which is what you want when the only thing being converted is the medium. Its own spread across platforms is 71.3&ndash;87.4ms, so treat go/no-go percentiles as good to a few points rather than exact.</p>
+  <p>Two further limitations, stated rather than corrected. Schulz's task is faster-paced than this site's (500ms stimulus, 1250&ndash;1750ms between trials, against a 2&ndash;5 second random wait here), and a slower pace generally reads slower. And no intraindividual SD is published for that task, so the five-trial sampling noise that the visual model accounts for is simply absent here rather than estimated &mdash; which means the 60ms spread is, if anything, slightly narrow.</p>
+  <p><strong>The false-start count is not modelled at all.</strong> Schulz reports a commission error rate of 8.23% (SD 7.61) and an omission rate of 0.81% (SD 3.91), and those figures belong to the task parameters above and to no others. Commission rate moves sharply with how often a no-go trial occurs and how fast the task is paced; this site runs three no-go trials in eight, a far higher proportion than a research task uses, with a much longer wait. So the go latency gets a percentile and the false-start count gets a plain number with none. Inventing one to fill the cell would be worse than leaving it empty.</p>
+
+  <h3>F1 lights-out &mdash; median 273ms, spread <strong>38ms</strong></h3>
+  <p>The same two numbers as the visual model, and that is the finding rather than a shortcut. No governing body, team or journal publishes a distribution of start reaction times, and none publishes a ratified &ldquo;record&rdquo; one either. What the <a href="/f1-reaction-test/">F1 test</a> measures &mdash; a response to a screen going dark &mdash; is simple visual reaction time, so that is what it is scored against, and the label on the chart says so.</p>
+  <p>What the model does not capture: five lights on a one-second cadence are a warning signal, and warned responses tend to be faster than unwarned ones, while the hold that follows is short (0.2&ndash;3 seconds) against the visual test's unannounced 2&ndash;5. Neither effect is quantified here because no figure traceable to this exact procedure exists. Separately, that test enforces a <strong>100ms</strong> anticipation cutoff &mdash; a reading faster than that was already in motion before the cue &mdash; taken from World Athletics' sprint-start rule, which is the only reaction-time threshold any governing body publishes. The FIA's own false-start rule is about the car moving, not about latency, and contains no reaction time at all.</p>
+
   <h2 id="latency">How much of your score is your equipment?</h2>
   <p>This is the part almost nobody covers, and it matters more than most of the advice you will find about improving your reflexes. A browser test does not measure your reaction time. It measures your reaction time <em>plus</em> the time your computer takes to show you the cue, <em>plus</em> the time it takes to notice your click. Both are real milliseconds and neither is yours.</p>
 
@@ -199,9 +242,11 @@
   <ul class="source-list">
     <li>Woods DL, Wyma JM, Yund EW, Herron TJ, Reed B (2015). Factors influencing the latency of simple reaction time. Frontiers in Human Neuroscience 9:131.<span class="src-kind">peer-reviewed</span><br><a href="https://doi.org/10.3389/fnhum.2015.00131" rel="nofollow noopener" target="_blank">https://doi.org/10.3389/fnhum.2015.00131</a><br>Experiment 1, N = 1469, ages 18-65, 120 scored trials each. Mean simple visual reaction time 231 ms (213 ms once the apparatus's own 17.8 ms hardware delay is removed); between-subject SD 26.8 ms; mean intraindividual (trial-to-trial) SD 40.0 ms; age slope 0.55 ms/year; the seven age-band means below; measured display delay 11.0 ms and response-button delay 6.8 ms. No significant sex difference.</li>
     <li>Human Benchmark — Reaction Time Statistics (accessed 2026).<span class="src-kind">web dataset</span><br><a href="https://humanbenchmark.com/tests/reactiontime/statistics" rel="nofollow noopener" target="_blank">https://humanbenchmark.com/tests/reactiontime/statistics</a><br>Over 81 million browser-measured reaction time clicks: median 273 ms, mean 284 ms. Also states "30ms is currently a typical lag for a desktop/laptop". Aggregated by that site, not by this one.</li>
-    <li>Anwyl-Irvine A, Dalmaijer ES, Hodges N, Evershed JK (2021). Realistic precision and accuracy of online experiment platforms, web browsers, and devices. Behavior Research Methods 53(4):1407-1425.<span class="src-kind">peer-reviewed</span><br><a href="https://doi.org/10.3758/s13428-020-01501-5" rel="nofollow noopener" target="_blank">https://doi.org/10.3758/s13428-020-01501-5</a><br>Response-time lag of browser-based experiment platforms, measured with a calibrated robot actuator whose own initiation latency was accounted for: platform means 71.3-87.4 ms; by browser, Safari 76.5 ms to Firefox 82.3 ms; by system, Windows laptop 73.7 ms to macOS desktop 85.4 ms.</li>
+    <li>Anwyl-Irvine A, Dalmaijer ES, Hodges N, Evershed JK (2021). Realistic precision and accuracy of online experiment platforms, web browsers, and devices. Behavior Research Methods 53(4):1407-1425.<span class="src-kind">peer-reviewed</span><br><a href="https://doi.org/10.3758/s13428-020-01501-5" rel="nofollow noopener" target="_blank">https://doi.org/10.3758/s13428-020-01501-5</a><br>Response-time lag of browser-based experiment platforms, measured with a calibrated robot actuator whose own initiation latency was accounted for: platform means 71.3-87.4 ms; by browser, Chrome 78.81 ms (SD 18.51), and across browsers Safari 76.5 ms to Firefox 82.3 ms; by system, Windows laptop 73.7 ms to macOS desktop 85.4 ms.</li>
+    <li>Jain A, Bansal R, Kumar A, Singh KD (2015). A comparative study of visual and auditory reaction times on the basis of gender and physical activity levels of medical first year students. International Journal of Applied and Basic Medical Research 5(2):124-127.<span class="src-kind">peer-reviewed</span><br><a href="https://doi.org/10.4103/2229-516X.157168" rel="nofollow noopener" target="_blank">https://doi.org/10.4103/2229-516X.157168</a><br>Visual and auditory simple reaction time measured in the same 120 subjects on the same apparatus: visual 247.60 ms (SD 18.54), auditory 228.01 ms (SD 16.49). Each subject's score is the fastest of five readings, not a mean, so the absolute levels are faster than a mean-based figure would be — only the difference and the ratio between the two conditions are used here.</li>
+    <li>Schulz KP, Fan J, Magidina O, Marks DJ, Hahn B, Halperin JM (2007). Does the emotional go/no-go task really measure behavioral inhibition? Convergence with measures on a non-emotional analog. Archives of Clinical Neuropsychology 22(2):151-160.<span class="src-kind">peer-reviewed</span><br><a href="https://doi.org/10.1016/j.acn.2006.12.001" rel="nofollow noopener" target="_blank">https://doi.org/10.1016/j.acn.2006.12.001</a><br>Non-emotional go/no-go task, N = 85, green square = go and red square = no-go, stimulus shown for 500 ms with an inter-stimulus interval of 1250-1750 ms. Mean go reaction time 362 ms (SD 57); commission errors (responses on a no-go trial) 8.23% (SD 7.61); omission errors 0.81% (SD 3.91). The error rates belong to those task parameters and are quoted only alongside them — commission rate moves with the proportion of no-go trials and with pacing.</li>
   </ul>
-  <p class="disclaimer">Figures are quoted as published. Where this page derives something from them — the 38ms spread and the 42ms browser adjustment — the derivation is spelled out above rather than presented as a measurement.</p>
+  <p class="disclaimer">Figures are quoted as published, with the task parameters they belong to. Where this page derives something from them — the 38ms spread, the 42ms browser adjustment, and the audio and go/no-go models above — the derivation is spelled out rather than presented as a measurement.</p>
 
   <h2>Related</h2>
   <div class="faq-item">
@@ -229,7 +274,7 @@
   </div>
 </footer>
 <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
-<script src="/assets/js/nav.js?v=5"></script>
+<script src="/assets/js/nav.js?v=6"></script>
 <a href="https://erabb.it" class="erabbit-mark" aria-label="erabb.it"><img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐇</text></svg>" width="10" height="10" alt=""></a>
 </body>
 </html>

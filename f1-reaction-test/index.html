@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F1 Reaction Test - Five Lights Out, How Fast Is Your Start?</title>
+<meta name="description" content="Free F1 start reaction test. Five red lights, a random hold, then lights out - measure your getaway in milliseconds over 5 starts. Uses the real start procedure, runs entirely in your browser.">
+<link rel="canonical" href="https://reflexzap.com/f1-reaction-test/">
+<meta name="theme-color" content="#05070b">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="F1 Reaction Test - Lights Out and Away We Go">
+<meta property="og:description" content="Five red lights, an unannounced hold of 0.2 to 3 seconds, then darkness. Measure your start reaction over 5 attempts.">
+<meta property="og:url" content="https://reflexzap.com/f1-reaction-test/">
+<meta property="og:image" content="https://reflexzap.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="F1 Reaction Test - Lights Out and Away We Go">
+<meta name="twitter:description" content="Five red lights, an unannounced hold of 0.2 to 3 seconds, then darkness. Measure your start reaction over 5 attempts.">
+<meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
+
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/styles.css?v=6">
+<script>try{var t=localStorage.getItem("reflexzap_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "F1 Reaction Test",
+  "url": "https://reflexzap.com/f1-reaction-test/",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free browser-based Formula 1 start reaction test: five red lights illuminate in sequence and are extinguished after a random hold, measuring reaction from lights-out in milliseconds over 5 starts."
+}
+</script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7560786263587509" crossorigin="anonymous"></script>
+</head>
+<body data-mode="f1">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="reflexzap.com home">
+      <span class="brand-mark"><span class="bolt" aria-hidden="true"></span>ReflexZap</span>
+      <span class="brand-tag">reaction time test</span>
+    </a>
+    <div class="header-actions">
+      <button id="sound-toggle" class="icon-btn" type="button" aria-label="Toggle sound effects" title="Toggle sound">&#128266;</button>
+      <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle dark/light theme" title="Toggle theme">&#9680;</button>
+    </div>
+  </div>
+</header>
+
+<!-- nav:start -->
+<nav class="toolbar" aria-label="Tools">
+  <details class="tb-menu">
+    <summary class="tb-trigger" aria-label="All 9 tests &amp; guides">
+      <span class="tb-glyph" aria-hidden="true">&#9636;</span>
+      <span class="tb-label">All 9<span class="tb-label-long"> tests &amp; guides</span></span>
+    </summary>
+    <div class="tb-sheet">
+      <p class="tb-grouplabel" id="tb-g1">Tests</p>
+      <ul aria-labelledby="tb-g1">
+        <li><a href="/">Visual Reaction Time Test</a></li>
+        <li><a href="/audio-reaction-time-test/">Audio Reaction Time Test</a></li>
+        <li><a href="/choice-reaction-time-test/">Go / No-Go Reaction Test</a></li>
+        <li><a href="/f1-reaction-test/" aria-current="page">F1 Lights-Out Reaction Test</a></li>
+      </ul>
+      <p class="tb-grouplabel" id="tb-g2">Your score</p>
+      <ul aria-labelledby="tb-g2">
+        <li><a href="/reaction-time-percentiles/">Reaction Time Percentiles</a></li>
+        <li><a href="/articles/reaction-time-in-gaming.html">Reaction Time in Gaming</a></li>
+        <li><a href="/articles/what-affects-reaction-time.html">What Affects Your Reaction Time</a></li>
+      </ul>
+      <p class="tb-grouplabel" id="tb-g3">How it is measured</p>
+      <ul aria-labelledby="tb-g3">
+        <li><a href="/articles/how-this-test-works.html">How This Test Works</a></li>
+        <li><a href="/articles/history-of-reaction-time.html">History of Reaction Time</a></li>
+      </ul>
+    </div>
+  </details>
+  <div class="tb-scrim"></div>
+  <ul class="tb-rail">
+    <li><a href="/">Visual</a></li>
+    <li><a href="/audio-reaction-time-test/">Audio</a></li>
+    <li><a href="/choice-reaction-time-test/">Go / No-Go</a></li>
+    <li><a href="/f1-reaction-test/" aria-current="page">F1 Lights</a></li>
+    <li><a href="/reaction-time-percentiles/">Percentiles</a></li>
+    <li><a href="/articles/reaction-time-in-gaming.html">Gaming</a></li>
+    <li><a href="/articles/what-affects-reaction-time.html">What Affects It</a></li>
+    <li><a href="/articles/how-this-test-works.html">How It Works</a></li>
+  </ul>
+</nav>
+<!-- nav:end -->
+
+<main id="main">
+  <div class="cabinet">
+    <div class="marquee">
+      <div class="marquee-logo"><span class="mq-1">Reflex</span><span class="mq-2">Grid</span></div>
+      <div class="marquee-sub">Lights Out &middot; reflexzap.com</div>
+    </div>
+
+    <div class="crt">
+      <div class="crt-screen">
+        <div class="duel-hud">
+          <div class="duelist duelist--you">
+            <span class="duelist-name">You</span>
+            <span class="pips" id="pips-you"></span>
+          </div>
+          <div class="duel-center">
+            <span class="dc-round" id="round-label">Round 1 of 5</span>
+            <span class="dc-best">Best <b id="best-chip-value">&mdash;</b></span>
+          </div>
+          <div class="duelist duelist--rival">
+            <span class="pips" id="pips-rival"></span>
+            <span class="duelist-name">Rival</span>
+          </div>
+        </div>
+
+        <div class="credit-line"><span class="blink" id="score-credit">Free Play</span></div>
+        <div class="challenge-banner" id="challenge-banner" hidden>
+          <span class="cb-kicker">Challenge</span>
+          <span class="cb-text" id="challenge-text"></span>
+        </div>
+
+        <div class="f1-lights" id="f1-lights" aria-hidden="true"><span class="f1-light"></span><span class="f1-light"></span><span class="f1-light"></span><span class="f1-light"></span><span class="f1-light"></span></div>
+        <div class="test-stage state-idle" id="test-stage" role="button" tabindex="0" aria-live="polite" aria-label="Reaction time test area">
+          <div class="stage-round-pill" id="stage-round-pill" aria-hidden="true">Round 1 of 5</div>
+          <button type="button" id="stage-cancel-btn" class="stage-cancel" aria-label="Cancel test">&#10005;</button>
+          <div id="stage-content">
+            <p class="stage-title">On the grid</p>
+            <p class="stage-sub">Hit Draw. Five red lights come on one by one — react the instant they all go out.</p>
+          </div>
+        </div>
+      </div>
+      <div class="crt-glare" aria-hidden="true"></div>
+    </div>
+
+    <div class="deck deck--solo">
+      <div class="deck-center" id="stage-controls">
+        <button type="button" id="start-btn" class="start-btn"><span class="start-ring"></span><span class="start-text">Draw!</span></button>
+        <div class="coin-door" aria-hidden="true"><span class="coin-slot"></span>Insert Coin &middot; Free Play</div>
+      </div>
+    </div>
+    <nav class="test-switch" aria-labelledby="test-switch-label">
+      <span class="test-switch-label" id="test-switch-label">The four tests</span>
+      <ul>
+        <li><a href="/">Visual</a></li>
+        <li><a href="/audio-reaction-time-test/">Audio</a></li>
+        <li><a href="/choice-reaction-time-test/">Go / No-Go</a></li>
+        <li><a href="/f1-reaction-test/" aria-current="page">F1 Lights</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <section class="panel panel-narrow" id="results-panel" hidden>
+    <h2>Your results</h2>
+    <div class="rating-banner">
+      <div class="grade-stamp" id="result-grade" aria-hidden="true"></div>
+      <div class="rating-label" id="rating-label"></div>
+      <div class="rating-note" id="rating-note"></div>
+      <div class="rating-percentile" id="rating-percentile"></div>
+    </div>
+    <div class="challenge-verdict" id="challenge-verdict" hidden></div>
+
+    <div class="dist-card" id="dist-card" hidden>
+      <div class="chart-card-title">Where that lands in the published distribution</div>
+      <div id="dist-chart"></div>
+      <p class="dist-source">Modelled from simple visual reaction times in published studies and one large public web dataset &mdash; no F1-specific distribution is published anywhere, and this is <strong>not</strong> built from results recorded on this site. <a href="/reaction-time-percentiles/">See the full table and sources</a>.</p>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-title">Your 5 starts</div>
+      <div id="rounds-chart"></div>
+    </div>
+
+    <div class="results-grid">
+      <div class="stat-tile highlight">
+        <div class="stat-label">Average</div>
+        <div class="stat-value" id="result-avg">&mdash;</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-label">Best round</div>
+        <div class="stat-value" id="result-best">&mdash;</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-label">All-time best</div>
+        <div class="stat-value" id="result-alltime-best">&mdash;</div>
+      </div>
+    </div>
+
+    <table class="rounds-table visually-hidden">
+      <caption class="visually-hidden">Exact time for each round</caption>
+      <thead><tr><th>Round</th><th class="num">Time</th></tr></thead>
+      <tbody id="rounds-tbody"></tbody>
+    </table>
+
+    <div class="btn-row">
+      <button type="button" id="retry-btn" class="primary">Test again</button>
+      <button type="button" id="copy-btn" class="icon-btn">Copy challenge link</button>
+    </div>
+    <p class="disclaimer">This is a fun, approximate browser-based test &mdash; not a scientific or medical instrument. Your measured time includes your device's screen refresh rate, input latency, and browser/OS rendering delay. The percentile above compares you against a model built from published research, all cited below &mdash; it is not a ranking against other people who have used this site, because no results are ever collected here.</p>
+  </section>
+
+  <section class="panel panel-narrow" id="history-panel">
+    <h2>Your history</h2>
+    <div id="history-empty" class="disclaimer" style="margin-top:0;">No sessions yet &mdash; run the test above to start tracking your history.</div>
+    <div id="history-sparkline" class="sparkline-wrap" hidden></div>
+    <table class="rounds-table" id="history-table" hidden>
+      <thead><tr><th>Date</th><th class="num">Average</th></tr></thead>
+      <tbody id="history-tbody"></tbody>
+    </table>
+  </section>
+
+  <section class="container-narrow" style="padding-top:0;">
+  <h1>F1 Reaction Test: Lights Out and Away We Go</h1>
+
+  <p>Five red lights come on, one per second. They hold. Then they all go out at once,
+  and that is the signal. This test runs the Formula 1 start procedure and measures
+  the gap between lights-out and your click, tap or <kbd>Space</kbd> &mdash; five
+  starts, then an average. What it will not do is repeat the three things about F1
+  reaction times that the rest of the internet has confidently wrong.</p>
+
+  <div class="callout">
+    <strong>Your browser is in the measurement.</strong> Every number on this page
+    is a browser reading, and a browser reads slower than a laboratory. Anwyl-Irvine
+    and colleagues drove research-grade browser platforms with a calibrated robot
+    finger and measured a mean response lag of <strong>78.81ms</strong> (SD 18.51) in
+    Chrome, and 71.3&ndash;87.4ms across platforms. That delay is your screen, your
+    input device and your operating system, and none of it is you. Where this page
+    quotes a figure measured on laboratory equipment it says so and states the
+    correction applied &mdash; a lab number and a browser number are never presented
+    as the same kind of thing.
+  </div>
+
+  <h2 id="procedure">The real procedure</h2>
+  <p>At a Grand Prix start the five red lights illuminate in sequence at one-second
+  intervals. Then comes the part that makes the whole thing a reaction test rather
+  than a rhythm test: the lights are held for a period the drivers cannot predict
+  &mdash; a randomly chosen interval of roughly <strong>0.2 to 3 seconds</strong>
+  &mdash; before being extinguished together. The race begins when they go out, not
+  when they come on. This test uses exactly that: one-second light steps, then a
+  random hold in that range, then darkness.</p>
+
+  <p>The unpredictable hold is the entire design. If the delay were fixed, a driver
+  could count it out and leave on the count, and the start would measure timing rather
+  than reaction. The same is true here: five lights on a one-second cadence are easy
+  to anticipate, and then the ground moves.</p>
+
+  <h2 id="jump-start">What actually counts as a jump start</h2>
+  <p>Here is the correction worth making. There is a widely repeated claim that
+  Formula 1 penalises any start reaction faster than some threshold &mdash; usually
+  quoted as 0.2 seconds, sometimes 0.1. <strong>There is no reaction time threshold
+  anywhere in the Formula 1 regulations.</strong></p>
+
+  <p>The FIA Formula 1 Sporting Regulations define a false start in terms of
+  <em>movement</em>: a car that moves before the signal is given has jumped the start,
+  and that is judged by the transponder-based detection system, not by a stopwatch on
+  the driver's nervous system (2025 Sporting Regulations, Articles 44.10(b) and
+  48.1(a)). A car that stays still until lights-out has not jumped the start no matter
+  how quickly it then goes. The rule is about position, not latency, and the two get
+  conflated constantly.</p>
+
+  <p>The related myth is the &ldquo;record&rdquo; F1 start reaction time. Various
+  figures circulate, attached to various drivers. No primary source publishes one:
+  the FIA does not release per-driver start reaction times as a ratified statistic,
+  and there is no official record to hold. This page therefore does not quote one, and
+  you should be suspicious of pages that do.</p>
+
+  <h2 id="anticipation">The 100ms rule this test does use</h2>
+  <p>A response under a tenth of a second after the cue was already on its way before
+  the cue arrived &mdash; the signal has not finished crossing your nervous system in
+  that time, let alone reached your hand. So a reading below <strong>100ms</strong>
+  here is treated as an anticipated getaway rather than a reaction, and the round
+  restarts instead of scoring.</p>
+
+  <p>That threshold is borrowed, and the source matters because it is the only
+  governing body that publishes one. World Athletics rules a sprint start reaction
+  faster than 0.100 seconds an anticipation rather than a reaction (Technical Rules,
+  Book C &ndash; C2.1), and disqualifies on that basis. It is a sprinter's number, not
+  a driver's, and it is applied here for the same reason it exists there: a start test
+  that rewards guessing is not measuring reaction. This is the only test on this site
+  that enforces it, because it is the only one where the cue is preceded by a
+  countdown worth guessing against.</p>
+
+  <h2 id="percentile">What your percentile is actually against</h2>
+  <p>Plainly: the general simple visual reaction time distribution, the same one
+  behind the <a href="/">visual reaction time test</a> &mdash; a median of
+  <strong>273ms</strong> and a spread of <strong>38ms</strong>, derived from a
+  published 81-million-click browser dataset and from Woods and colleagues, with the
+  full derivation on the <a href="/reaction-time-percentiles/">percentile reference
+  page</a>.</p>
+
+  <p>It is not an F1-specific distribution, because none exists. No governing body,
+  team or journal publishes a population of start reaction times, and inventing
+  parameters to fill that gap would be fabricating statistics rather than reporting
+  them. What this test measures &mdash; a response to a screen going dark &mdash; is
+  simple visual reaction time, so simple visual reaction time is what it is scored
+  against, and the label says so.</p>
+
+  <p>Two things that model does not capture, stated rather than hidden. The five-light
+  countdown is a warning signal, and warned responses tend to be faster than unwarned
+  ones; the visual test's unannounced two-to-five-second wait has no such warning. And
+  the hold here is short, 0.2 to 3 seconds against that test's 2 to 5. Both differences
+  push in directions that no figure traceable to this exact procedure can quantify, so
+  read your F1 percentile as &ldquo;where this reading would sit on the general
+  simple-reaction curve&rdquo;, which is literally what it is.</p>
+
+  <h2>Frequently asked questions</h2>
+  <div class="faq-item">
+    <h3>What is a good F1 reaction time?</h3>
+    <p>Anything under about 250ms on a browser is a quick getaway, and under 200ms is at the edge of what a screen and a mouse allow. Bear in mind that a real start also involves releasing a clutch paddle and managing wheelspin, so a click here is the reaction component alone, without any of the car control that decides whether the reaction turns into a good start.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Does F1 disqualify you for reacting too fast?</h3>
+    <p>No. The regulations define a false start as the car moving before the signal, detected by transponder &mdash; there is no reaction time threshold in them at all. The commonly quoted 0.2-second rule does not exist in Formula 1. It is sprinting, under World Athletics rules, that uses a 0.100-second anticipation threshold, and this test borrows that number for its own jump-start rule.</p>
+  </div>
+  <div class="faq-item">
+    <h3>What is the record F1 start reaction time?</h3>
+    <p>There isn't a published one. The FIA does not release per-driver start reaction times as a ratified record, so any specific figure you see attached to a driver's name is unsourced. This page deliberately does not quote one.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Why did my round restart when I was really fast?</h3>
+    <p>Because it was too fast to be a reaction. Anything under 100ms after lights-out was already in motion before the lights went out, so the test treats it as an anticipated start and runs the round again rather than scoring a physically impossible number.</p>
+  </div>
+  <div class="faq-item">
+    <h3>How long is the hold?</h3>
+    <p>Randomly between 0.2 and 3 seconds after the fifth light, which is the range used at a real start. It is re-rolled every round, so counting will not help you.</p>
+  </div>
+
+  <h2 id="sources">Sources and rules</h2>
+  <ul class="source-list">
+    <li>F&eacute;d&eacute;ration Internationale de l'Automobile &mdash; 2025 Formula 1
+    Sporting Regulations, Articles 44.10(b) and 48.1(a).<span class="src-kind">governing body</span><br>
+    <a href="https://www.fia.com/regulation/category/110" rel="nofollow noopener" target="_blank">https://www.fia.com/regulation/category/110</a><br>
+    Define a false start by movement of the car before the starting signal, detected
+    by the transponder system. They specify no reaction time threshold.</li>
+    <li>World Athletics &mdash; Technical Rules, Book C, C2.1.<span class="src-kind">governing body</span><br>
+    <a href="https://worldathletics.org/about-iaaf/documents/book-of-rules" rel="nofollow noopener" target="_blank">https://worldathletics.org/about-iaaf/documents/book-of-rules</a><br>
+    A start reaction faster than 0.100 s is ruled an anticipation rather than a
+    reaction. This is the source of the 100ms cutoff this test applies.</li>
+    <li>Formula 1 &mdash; race start procedure explainer, formula1.com, 2 March 2024.<span class="src-kind">official publisher</span><br>
+    States that the five red lights are extinguished after a randomly chosen hold of
+    between 0.2 and 3 seconds. This is the specification the test's hold is built to.</li>
+    <li>Human Benchmark &mdash; Reaction Time Statistics (accessed 2026).<span class="src-kind">web dataset</span><br><a href="https://humanbenchmark.com/tests/reactiontime/statistics" rel="nofollow noopener" target="_blank">https://humanbenchmark.com/tests/reactiontime/statistics</a><br>Over 81 million browser-measured reaction time clicks: median 273 ms, mean 284 ms. Aggregated by that site, not by this one.</li>
+    <li>Woods DL, Wyma JM, Yund EW, Herron TJ, Reed B (2015). Factors influencing the latency of simple reaction time. Frontiers in Human Neuroscience 9:131.<span class="src-kind">peer-reviewed</span><br><a href="https://doi.org/10.3389/fnhum.2015.00131" rel="nofollow noopener" target="_blank">https://doi.org/10.3389/fnhum.2015.00131</a><br>N = 1469, ages 18-65, 120 scored trials each. Mean simple visual reaction time 231 ms; between-subject SD 26.8 ms; mean trial-to-trial SD 40.0 ms within each individual.</li>
+    <li>Anwyl-Irvine A, Dalmaijer ES, Hodges N, Evershed JK (2021). Realistic precision and accuracy of online experiment platforms, web browsers, and devices. Behavior Research Methods 53(4):1407-1425.<span class="src-kind">peer-reviewed</span><br><a href="https://doi.org/10.3758/s13428-020-01501-5" rel="nofollow noopener" target="_blank">https://doi.org/10.3758/s13428-020-01501-5</a><br>Mean browser response lag measured with a calibrated robot actuator: Chrome 78.81 ms (SD 18.51); 71.3-87.4 ms across the four platforms tested.</li>
+  </ul>
+  <p class="disclaimer">No reaction time figure is attributed to any driver or to any
+  race on this page, because no primary source publishes one.</p>
+
+  <h2>Related</h2>
+  <div class="faq-item">
+    <h3><a href="/">Visual Reaction Time Test</a></h3>
+    <p>The same stimulus without the countdown &mdash; an unannounced wait of two to five seconds instead of five lights.</p>
+  </div>
+  <div class="faq-item">
+    <h3><a href="/audio-reaction-time-test/">Audio Reaction Time Test</a></h3>
+    <p>No lights at all. A tone fires instead, and hearing reaches the motor system about twenty milliseconds sooner.</p>
+  </div>
+  <div class="faq-item">
+    <h3><a href="/reaction-time-percentiles/">Reaction Time Percentiles</a></h3>
+    <p>The distribution this test scores you against, the age bands, and every source behind it.</p>
+  </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>&copy; <span id="year"></span> reflexzap.com</div>
+    <div class="footer-links">
+      <a href="/reaction-time-percentiles/">Percentiles</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/nav.js?v=6"></script>
+<a href="https://erabb.it" class="erabbit-mark" aria-label="erabb.it"><img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128007;</text></svg>" width="10" height="10" alt=""></a>
+
+<div class="announce" id="announce" aria-hidden="true"></div>
+<div class="toast" id="toast">Copied!</div>
+<div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
+
+<script src="/assets/js/percentile.js?v=6"></script>
+<script src="/assets/js/app.js?v=6"></script>
+</body>
+</html>

@@ -5,6 +5,59 @@ milliseconds) built as a **retro arcade cabinet**. Static, zero-dependency site:
 vanilla HTML/CSS/JS, no build step, GitHub Pages (`CNAME` → reflexzap.com,
 Cloudflare DNS). Everything runs client-side; nothing is uploaded.
 
+## The four tests — one engine, `data-mode` on `<body>`
+
+reflexzap runs four tests off one state machine. `document.body.dataset.mode`
+picks the stimulus; an absent attribute is the original visual test, so
+`index.html` needs no attribute and no behaviour change.
+
+| mode | page | stimulus | scored |
+|---|---|---|---|
+| (none) / `visual` | `/` | box turns green | 5 rounds |
+| `audio` | `/audio-reaction-time-test/` | synthesized tone, screen inert | 5 rounds |
+| `choice` | `/choice-reaction-time-test/` | green go / red no-go | 5 go + 3 no-go |
+| `f1` | `/f1-reaction-test/` | 5 lights, 0.2–3s hold, lights out | 5 starts |
+
+The `MODES` table at the top of the app.js IIFE owns everything that must not
+bleed between them: the cited model the percentile is read from, the
+localStorage keys, the share URL, the stage copy, the CPU rival's speed.
+
+- **Only the visual test keeps the absolute-millisecond rating bands.** They were
+  chosen for that stimulus. The other three read their band off their own model's
+  percentile, which is the only rating that stays honest when the distribution
+  moves.
+- **Only the visual test is gamified.** XP, streaks and achievements have
+  thresholds picked for it ("average under 200ms"); a tone or a lights-out start
+  clears them far more easily, and one shared profile would turn the badges into
+  participation trophies.
+- **Audio and F1 must not change anything on screen when the round arms.** A
+  visual change would be a second and faster stimulus, and it would put layout
+  work inside the interval being measured. The CSS pins those stages to the idle
+  inset through `waiting` and `ready` alike — do not "helpfully" add a cue.
+- The audio cue is timestamped at the tone's real onset via
+  `AudioContext.getOutputTimestamp()`, not at the moment the note was scheduled.
+  Scheduling time would hand the player the whole output buffer as free reaction
+  time. `outputLatency` is the documented fallback.
+- The F1 test rejects anything under **100ms** as an anticipated getaway rather
+  than scoring it. That threshold is World Athletics' sprint-start rule
+  (Technical Rules, Book C – C2.1) and lives in `percentile.js` with the other
+  cited constants. The FIA's own false-start rule is about the car *moving*, not
+  about latency — never invent an F1 reaction-time threshold or a "record".
+
+## The three sibling test pages are GENERATED
+
+`tools/build_tests.py` renders all six files (three clean paths + three flat
+aliases, byte-identical pairs). **Edit that script, never the HTML it writes** —
+`node --test test/percentile.test.js` runs `--check` and fails on a hand-edit.
+
+```
+python3 tools/build_tests.py && python3 tools/sync_nav.py
+```
+
+Order-independent and idempotent: `build_tests.py` carries whatever sync_nav has
+put between the nav markers straight across. `index.html` is NOT generated; it is
+the one page whose markup is not a variation on anything.
+
 ## Files
 
 - `index.html` — the whole game UI + About/FAQ + article list. Articles in
@@ -13,8 +66,9 @@ Cloudflare DNS). Everything runs client-side; nothing is uploaded.
   for Node tests), then one IIFE with the gamification layer (XP/levels/ranks/
   achievements/streaks), WebAudio sound synth, the round state machine, and the
   arcade HUD.
-- `assets/js/percentile.js` — the cited percentile engine (see below). Loaded
-  **before** `app.js`; DOM-free and `require()`-able.
+- `assets/js/percentile.js` — the cited percentile engine (see below), now
+  carrying **four** models. Loaded **before** `app.js`; DOM-free and
+  `require()`-able.
 - `assets/css/styles.css` — the whole design system, one file.
 - `reaction-time-percentiles/index.html` + `reaction-time-percentiles.html` —
   the percentile reference page, shipped at the clean path with a flat alias
@@ -112,8 +166,14 @@ finish all 5 rounds.
 ## localStorage keys
 
 `reflexzap_theme`, `reflexzap_sound_muted`, `reflexzap_profile` (XP/level/streak/
-achievements), `reflexzap_best_ms` (fastest single round = BEST TIME),
-`reflexzap_history` (last 10 session averages).
+achievements — visual test only), `reflexzap_best_ms` (fastest single round =
+BEST TIME), `reflexzap_history` (last 10 session averages).
+
+Each sibling test carries its own pair, so a tone never lands in the visual
+test's history: `reflexzap_audio_best_ms` / `reflexzap_audio_history`,
+`reflexzap_choice_best_ms` / `reflexzap_choice_history`, `reflexzap_f1_best_ms` /
+`reflexzap_f1_history`. The keys live in the `MODES` table, not scattered through
+the engine.
 
 ## Shipping
 
@@ -148,7 +208,7 @@ reflexzap was rebuilt from the "web-slick" arcade pass into a genuine
   never touches timing.
 - **Cache-bust adopted**: `styles.css?v=` / `app.js?v=` on every page. **Bump
   the `?v=` on any coupled HTML+CSS/JS change** or cached visitors get new HTML
-  with stale CSS (this exact bug hit cpsboost). Currently `?v=5`.
+  with stale CSS (this exact bug hit cpsboost). Currently `?v=6`.
 
 ## The nav toolbar — never hand-edit it
 
@@ -161,10 +221,14 @@ after `</header>`.
   generic portfolio script, byte-identical across sites — do not modify it.
   `python3 tools/sync_nav.py` rewrites the block in all ten `.html` files;
   `--check` exits nonzero on drift and is worth running before you push.
-- The rail is the five tier-1 destinations (percentile reference + four
-  guides). The test is the sheet's **hub row**, not a rail chip, because Home is
-  the brand — it is the one destination in the chrome that is not a peer of the
-  list above it, and it is what gives `index.html` an `aria-current` target.
+- Nine tier-1 destinations — four tests, then the percentile reference and four
+  guides. The rail carries the first eight and the sheet carries all nine, so the
+  ORDER in `nav_data.py` is what decides which one destination is sheet-only
+  (History, the page nobody arrives mid-session wanting). Nine is also what turns
+  the sheet's group headings on; below nine the renderer emits one flat list.
+- `HUBS` is now empty. The hub row existed only to give `index.html` a place in
+  the chrome; it is one of four sibling tests now and takes the first rail chip,
+  which carries the `aria-current` target the hub row was there to provide.
 - **Not sticky.** Neither the header nor the bar; the spec forbids it (sticky
   chrome can overlay an AdSense anchor unit). Closed chrome is 51px header +
   45px bar = **96px at every width**; the 100px ceiling is the budget, so any
@@ -198,6 +262,19 @@ there is no backend and nothing leaves the device, so we cannot have any.
 - Everything above the "SITE-SPECIFIC POPULATION MODEL" heading is generic and
   unit-agnostic (`lowerIsBetter` flips the direction). It is meant to drop into
   cpsboost / wpmflex / flicktrainer / chimpmemory with only the model replaced.
+- **Four models now, exported as `MODELS` and individually.** Audio shifts the
+  visual model by the within-subject auditory advantage from a study that
+  measured both stimuli in the same people (only the *contrast* transfers, not
+  the levels). Go/no-go converts a laboratory mean onto browser footing with
+  Anwyl-Irvine's measured Chrome lag, and states that correction rather than
+  absorbing it. F1 deliberately reuses the visual model's two numbers, because
+  the stimulus is the same and no F1-specific distribution is published — that is
+  the finding, not a shortcut.
+- **Some numbers may only be quoted with their task parameters.** The go/no-go
+  commission rate of 8.23% belongs to a 500ms stimulus and a 1250–1750ms ISI;
+  quoted bare it reads as a benchmark a visitor can compare against, and it is
+  not one. A test enforces this. The false-start count therefore ships with no
+  percentile at all — an empty cell beats an invented one.
 - The reference page's table is static HTML for SEO; a test asserts it still
   matches what the module computes, so **re-run the tests after changing the
   model** and update the page if they fail.
