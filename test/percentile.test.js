@@ -433,6 +433,87 @@ test("the percentile reference page carries a row for every model", () => {
   }
 });
 
+/* ---------------- /audio-vs-visual-reaction-time/ ----------------
+   Nothing generates this pair — build_tests.py renders only the three sibling
+   tests — so these assertions are the only thing standing between the two
+   halves and a silent drift. */
+
+const COMPARE = path.join(REPO, "audio-vs-visual-reaction-time/index.html");
+const compareHtml = fs.readFileSync(COMPARE, "utf8");
+
+test("the audio-vs-visual page ships as an identical flat/clean pair", () => {
+  assert.strictEqual(
+    fs.readFileSync(path.join(REPO, "audio-vs-visual-reaction-time.html"), "utf8"),
+    compareHtml,
+    "the flat alias has drifted"
+  );
+  assert.ok(
+    compareHtml.includes('<link rel="canonical" href="https://reflexzap.com/audio-vs-visual-reaction-time/">'),
+    "canonical must point at the clean path"
+  );
+});
+
+test("the audio-vs-visual page cites every mechanism source in full", () => {
+  // Same rule the reference page is held to, applied to the sources that
+  // explain the mechanism rather than fit the model.
+  for (const source of P.MECHANISM_SOURCES) {
+    assert.ok(compareHtml.includes(source.url), `page does not cite ${source.id}`);
+    assert.ok(compareHtml.includes(source.citation), `page is missing the full citation for ${source.id}`);
+  }
+});
+
+test("the audio-vs-visual page does not restate the numeric derivation", () => {
+  // The percentiles page is older, internally linked from every test, and
+  // already carries Jain's figures in full. Repeating them here would put two
+  // pages of ours in the same result set competing on the same numbers, and
+  // this is the one that loses. It links instead.
+  for (const restated of ["247.60", "228.01", "18.54", "16.49"]) {
+    assert.ok(
+      !compareHtml.includes(restated),
+      `the comparison page restates ${restated}, which belongs to the percentiles page`
+    );
+  }
+  assert.ok(
+    compareHtml.includes("/reaction-time-percentiles/#other-tests"),
+    "it must link the derivation rather than repeat it"
+  );
+});
+
+test("the audio-vs-visual page compares like with like", () => {
+  const js = fs.readFileSync(path.join(REPO, "assets/js/compare.js"), "utf8");
+  // A fastest-of-many figure set beside a mean-based published contrast is a
+  // statistic mismatch, and it is the specific mistake this page must not make.
+  assert.ok(!/best_ms/.test(js), "compare.js must not read the single-best keys");
+  // Read-only: no shared profile, no merged history, no new storage.
+  // The call, not the word — the file names setItem in a comment forbidding it.
+  assert.ok(!/localStorage\s*\.\s*(setItem|removeItem|clear)\s*\(/.test(js), "compare.js must not write to storage");
+  for (const key of ["reflexzap_history", "reflexzap_audio_history"]) {
+    assert.ok(js.includes(key), `compare.js should read ${key}`);
+  }
+});
+
+test("the audio-vs-visual page carries the portfolio furniture", () => {
+  const adTags = compareHtml.match(/adsbygoogle\.js\?client=ca-pub-7560786263587509/g) || [];
+  assert.strictEqual(adTags.length, 1, "exactly one Auto-ads script tag");
+  assert.ok(!/class="[^"]*ad-slot/.test(compareHtml), "no manually placed ad units");
+  assert.match(compareHtml, /<\/footer>\s*(<script[^>]*>[^<]*<\/script>\s*)*<a href="https:\/\/erabb\.it" class="erabbit-mark"/);
+  assert.match(compareHtml, /erabbit-mark[\s\S]*?<\/a>\s*<\/body>/, "the mark must be the last element in body");
+  assert.ok(compareHtml.includes('aria-current="page"'), "the active nav link must be marked");
+  assert.ok(/<h1>[^<]+<\/h1>/.test(compareHtml), "the page needs its own h1");
+  const external = [...compareHtml.matchAll(/(?:src|href)="(https?:\/\/[^"]+)"/g)]
+    .map((m) => m[1])
+    .filter((u) => !u.startsWith("https://reflexzap.com/"))
+    .filter((u) => !u.startsWith("https://pagead2.googlesyndication.com/"))
+    .filter((u) => !/^https?:\/\/(doi\.org|humanbenchmark\.com|erabb\.it|schema\.org)/.test(u));
+  assert.deepStrictEqual(external, [], "unexpected external resource");
+});
+
+test("the audio-vs-visual page is listed in the sitemap, alias excluded", () => {
+  const sitemap = fs.readFileSync(path.join(REPO, "sitemap.xml"), "utf8");
+  assert.ok(sitemap.includes("<loc>https://reflexzap.com/audio-vs-visual-reaction-time/</loc>"));
+  assert.ok(!sitemap.includes("audio-vs-visual-reaction-time.html"));
+});
+
 /* -------------------- the three shipped page pairs -------------------- */
 
 for (const sib of SIBLINGS) {
@@ -496,7 +577,8 @@ for (const sib of SIBLINGS) {
 }
 
 test("every page is unique in the ways a search engine reads", () => {
-  const pages = ["index.html", "reaction-time-percentiles/index.html"]
+  const pages = ["index.html", "reaction-time-percentiles/index.html",
+                 "audio-vs-visual-reaction-time/index.html"]
     .concat(SIBLINGS.map((s) => `${s.slug}/index.html`));
   const seen = { title: new Map(), description: new Map(), canonical: new Map() };
   for (const rel of pages) {

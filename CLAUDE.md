@@ -50,6 +50,11 @@ localStorage keys, the share URL, the stage copy, the CPU rival's speed.
 aliases, byte-identical pairs). **Edit that script, never the HTML it writes** —
 `node --test test/percentile.test.js` runs `--check` and fails on a hand-edit.
 
+`/reaction-time-percentiles/` and `/audio-vs-visual-reaction-time/` are NOT
+generated — they are prose, not variations on a test — but they ship as the same
+byte-identical twin pair, and `percentile.test.js` asserts each pair is identical
+and canonicalises to the clean path.
+
 ```
 python3 tools/build_tests.py && python3 tools/sync_nav.py
 ```
@@ -68,7 +73,19 @@ the one page whose markup is not a variation on anything.
   arcade HUD.
 - `assets/js/percentile.js` — the cited percentile engine (see below), now
   carrying **four** models. Loaded **before** `app.js`; DOM-free and
-  `require()`-able.
+  `require()`-able. It also carries `MECHANISM_SOURCES`, kept separate from
+  `SOURCES`: those four citations feed no model parameter, they are the
+  physiology cited on `/audio-vs-visual-reaction-time/`, and keeping them out of
+  `SOURCES` is what stops the percentile reference page being forced to print
+  citations that explain nothing about its own table.
+- `assets/js/compare.js` — `/audio-vs-visual-reaction-time/` only, and
+  **strictly read-only**: it reads the four tests' existing `*_history` keys to
+  render the completion prompt and the personal audio-vs-visual gap. It writes
+  nothing and merges nothing — the four records stay four records, for the same
+  reason the sibling tests are not gamified. It compares average-to-average
+  (a mean of 5-round means on each side) and never a `*_best_ms` against the
+  published contrast, which would set a fastest-of-many figure beside a
+  mean-based one.
 - `assets/css/styles.css` — the whole design system, one file.
 - `reaction-time-percentiles/index.html` + `reaction-time-percentiles.html` —
   the percentile reference page, shipped at the clean path with a flat alias
@@ -221,11 +238,14 @@ after `</header>`.
   generic portfolio script, byte-identical across sites — do not modify it.
   `python3 tools/sync_nav.py` rewrites the block in all ten `.html` files;
   `--check` exits nonzero on drift and is worth running before you push.
-- Nine tier-1 destinations — four tests, then the percentile reference and four
-  guides. The rail carries the first eight and the sheet carries all nine, so the
-  ORDER in `nav_data.py` is what decides which one destination is sheet-only
-  (History, the page nobody arrives mid-session wanting). Nine is also what turns
-  the sheet's group headings on; below nine the renderer emits one flat list.
+- Ten tier-1 destinations — four tests, then the percentile reference, the
+  audio-vs-visual comparison and four guides. The rail carries the first eight
+  and the sheet carries all ten, so the ORDER in `nav_data.py` is what decides
+  which two destinations are sheet-only: the whole "How it is measured" group
+  (How This Test Works, History of Reaction Time), because those are the pages a
+  visitor goes looking for rather than stumbles into between rounds. Group
+  headings are on from the ninth destination; below nine the renderer emits one
+  flat list.
 - `HUBS` is now empty. The hub row existed only to give `index.html` a place in
   the chrome; it is one of four sibling tests now and takes the first rail chip,
   which carries the `aria-current` target the hub row was there to provide.

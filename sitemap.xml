@@ -26,6 +26,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://reflexzap.com/audio-vs-visual-reaction-time/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://reflexzap.com/articles/history-of-reaction-time.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

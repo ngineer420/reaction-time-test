@@ -17,29 +17,31 @@ leaving it as the only test without a chip would have been the odd one out in
 its own group. It takes the first chip, which also gives it the
 `aria-current="page"` target the hub row was there to provide, so HUBS is empty.
 
-Nine tier-1 destinations against a rail capped at 8. That is deliberate, not an
-oversight: the renderer puts the first eight in the rail and every one of the
-nine in the sheet, so the order below is what decides which single destination
-is sheet-only. History is last because it is the one page nobody arrives
-mid-session wanting. Nine is also what turns the sheet's group headings on —
-below nine the renderer emits one flat list, which is why the "tests" group
-would have been invisible had the count landed on eight.
+Ten tier-1 destinations against a rail capped at 8, so the order below decides
+which TWO are sheet-only. The rule that picks them, now that there is a choice to
+make: the rail carries the four tests and the pages that help you read a score
+you have just been given; the two pages about how the measurement is made —
+"How This Test Works" and "History of Reaction Time" — are the ones nobody
+arrives mid-session wanting, so the whole "How it is measured" group drops to the
+sheet. Every destination is still in the sheet, so the rail is never the only
+route to anything. Group headings are on from the ninth destination onwards.
 """
 
-# Noun used in the menu trigger: "All 9 tests & guides".
+# Noun used in the menu trigger: "All 10 tests & guides" (sync_nav derives the
+# count from len(TOOLS), so it follows this list on its own).
 #
 # It was "guides" while every destination was something to read. It cannot stay
-# that now that four of the nine are the tests themselves, and it cannot become
+# that now that four of the ten are the tests themselves, and it cannot become
 # "tests" for the same reason in reverse. Not "pages" either: the site has
 # sixteen of those, so any count attached to it would be false. The set is
 # genuinely two kinds of thing, so the noun says two kinds of thing.
 NOUN = "tests & guides"
 
-# Tier-1 destinations, in rail order (the rail cap is 8; this site has 5).
+# Tier-1 destinations, in rail order (the rail cap is 8; this site has 10).
 #   label -> rail chip text, <= 18 chars
 #   long  -> anchor text in the sheet
-#   group -> sheet grouping key, unused at <= 8 destinations (the sheet renders
-#            flat) but kept so the arrangement is already decided at the ninth
+#   group -> sheet grouping key; live, since the sheet renders grouped from the
+#            ninth destination onwards
 TOOLS = [
     # The four tests, in the order they were built. Each measures a different
     # stimulus against its own cited distribution.
@@ -51,16 +53,24 @@ TOOLS = [
     # a test ends — "is 250 ms good?" — and the only one that answers it with a
     # number rather than an explanation.
     {"href": "/reaction-time-percentiles/",              "label": "Percentiles",     "long": "Reaction Time Percentiles",        "group": "score",  "tier": 1},
+    # Second of the guides: the cross-test page. It belongs beside the
+    # percentiles page rather than with the tests — it runs no test — and it is
+    # the only destination that says anything about a visitor's results on more
+    # than one of them, which is exactly the question someone has after their
+    # second test rather than their first.
+    {"href": "/audio-vs-visual-reaction-time/",          "label": "Audio vs Visual", "long": "Audio vs Visual Reaction Time",    "group": "score",  "tier": 1},
     {"href": "/articles/reaction-time-in-gaming.html",   "label": "Gaming",          "long": "Reaction Time in Gaming",          "group": "score",  "tier": 1},
     {"href": "/articles/what-affects-reaction-time.html", "label": "What Affects It", "long": "What Affects Your Reaction Time", "group": "score",  "tier": 1},
+    # Sheet-only from here: ten destinations against a rail of eight. Both
+    # evictions are the "How it is measured" group, together, on purpose — a
+    # methodology page and a history are what a visitor goes looking for, not
+    # what they stumble into between rounds.
     {"href": "/articles/how-this-test-works.html",       "label": "How It Works",    "long": "How This Test Works",              "group": "method", "tier": 1},
-    # Sheet-only: nine destinations against a rail of eight, and this is the
-    # one nobody arrives mid-session wanting.
     {"href": "/articles/history-of-reaction-time.html",  "label": "History",         "long": "History of Reaction Time",         "group": "method", "tier": 1},
 ]
 
 # Sheet groups, in order. Live from the ninth destination onwards, which this
-# site now has — below that the renderer emits one flat list because group
+# site passed — below that the renderer emits one flat list because group
 # headings are noise at that size.
 GROUPS = [
     ("tests",  "Tests"),
@@ -74,8 +84,8 @@ GROUPS = [
 HUBS = []
 
 # No footer tool list here today, and the spec says not to add one where none
-# exists — the rail carries eight of the nine visibly and the sheet carries all
-# nine, which is the crawl path.
+# exists — the rail carries eight of the ten visibly and the sheet carries all
+# ten, which is the crawl path.
 FOOTER = []
 
 # One-time --migrate: this site ships no <nav> element at all, so there is
