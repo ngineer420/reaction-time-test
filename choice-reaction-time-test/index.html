@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Go / No-Go Reaction Test - Choice Reaction Time and False Starts</title>
+<meta name="description" content="Free go/no-go reaction test. Green means click, red means hold. Eight trials give you a mean go-latency and a false-start count - two numbers, measured in your browser, nothing uploaded.">
+<link rel="canonical" href="https://reflexzap.com/choice-reaction-time-test/">
+<meta name="theme-color" content="#05070b">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Go / No-Go Reaction Test - Speed and Self-Control">
+<meta property="og:description" content="Green means click. Red means don't. Get your mean go-latency and your false-start count in one 8-trial session.">
+<meta property="og:url" content="https://reflexzap.com/choice-reaction-time-test/">
+<meta property="og:image" content="https://reflexzap.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Go / No-Go Reaction Test - Speed and Self-Control">
+<meta name="twitter:description" content="Green means click. Red means don't. Get your mean go-latency and your false-start count in one 8-trial session.">
+<meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
+
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/styles.css?v=6">
+<script>try{var t=localStorage.getItem("reflexzap_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Go / No-Go Reaction Test",
+  "url": "https://reflexzap.com/choice-reaction-time-test/",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free browser-based go/no-go reaction test: respond to green cues and withhold on red ones, reporting mean go-trial latency in milliseconds and a count of false starts."
+}
+</script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7560786263587509" crossorigin="anonymous"></script>
+</head>
+<body data-mode="choice">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="reflexzap.com home">
+      <span class="brand-mark"><span class="bolt" aria-hidden="true"></span>ReflexZap</span>
+      <span class="brand-tag">reaction time test</span>
+    </a>
+    <div class="header-actions">
+      <button id="sound-toggle" class="icon-btn" type="button" aria-label="Toggle sound effects" title="Toggle sound">&#128266;</button>
+      <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle dark/light theme" title="Toggle theme">&#9680;</button>
+    </div>
+  </div>
+</header>
+
+<!-- nav:start -->
+<nav class="toolbar" aria-label="Tools">
+  <details class="tb-menu">
+    <summary class="tb-trigger" aria-label="All 9 tests &amp; guides">
+      <span class="tb-glyph" aria-hidden="true">&#9636;</span>
+      <span class="tb-label">All 9<span class="tb-label-long"> tests &amp; guides</span></span>
+    </summary>
+    <div class="tb-sheet">
+      <p class="tb-grouplabel" id="tb-g1">Tests</p>
+      <ul aria-labelledby="tb-g1">
+        <li><a href="/">Visual Reaction Time Test</a></li>
+        <li><a href="/audio-reaction-time-test/">Audio Reaction Time Test</a></li>
+        <li><a href="/choice-reaction-time-test/" aria-current="page">Go / No-Go Reaction Test</a></li>
+        <li><a href="/f1-reaction-test/">F1 Lights-Out Reaction Test</a></li>
+      </ul>
+      <p class="tb-grouplabel" id="tb-g2">Your score</p>
+      <ul aria-labelledby="tb-g2">
+        <li><a href="/reaction-time-percentiles/">Reaction Time Percentiles</a></li>
+        <li><a href="/articles/reaction-time-in-gaming.html">Reaction Time in Gaming</a></li>
+        <li><a href="/articles/what-affects-reaction-time.html">What Affects Your Reaction Time</a></li>
+      </ul>
+      <p class="tb-grouplabel" id="tb-g3">How it is measured</p>
+      <ul aria-labelledby="tb-g3">
+        <li><a href="/articles/how-this-test-works.html">How This Test Works</a></li>
+        <li><a href="/articles/history-of-reaction-time.html">History of Reaction Time</a></li>
+      </ul>
+    </div>
+  </details>
+  <div class="tb-scrim"></div>
+  <ul class="tb-rail">
+    <li><a href="/">Visual</a></li>
+    <li><a href="/audio-reaction-time-test/">Audio</a></li>
+    <li><a href="/choice-reaction-time-test/" aria-current="page">Go / No-Go</a></li>
+    <li><a href="/f1-reaction-test/">F1 Lights</a></li>
+    <li><a href="/reaction-time-percentiles/">Percentiles</a></li>
+    <li><a href="/articles/reaction-time-in-gaming.html">Gaming</a></li>
+    <li><a href="/articles/what-affects-reaction-time.html">What Affects It</a></li>
+    <li><a href="/articles/how-this-test-works.html">How It Works</a></li>
+  </ul>
+</nav>
+<!-- nav:end -->
+
+<main id="main">
+  <div class="cabinet">
+    <div class="marquee">
+      <div class="marquee-logo"><span class="mq-1">Reflex</span><span class="mq-2">Hold</span></div>
+      <div class="marquee-sub">Green Go &middot; Red No &middot; reflexzap.com</div>
+    </div>
+
+    <div class="crt">
+      <div class="crt-screen">
+        <div class="duel-hud">
+          <div class="duelist duelist--you">
+            <span class="duelist-name">You</span>
+            <span class="pips" id="pips-you"></span>
+          </div>
+          <div class="duel-center">
+            <span class="dc-round" id="round-label">Round 1 of 8</span>
+            <span class="dc-best">Best <b id="best-chip-value">&mdash;</b></span>
+          </div>
+          <div class="duelist duelist--rival">
+            <span class="pips" id="pips-rival"></span>
+            <span class="duelist-name">Rival</span>
+          </div>
+        </div>
+
+        <div class="credit-line"><span class="blink" id="score-credit">Free Play</span></div>
+        <div class="challenge-banner" id="challenge-banner" hidden>
+          <span class="cb-kicker">Challenge</span>
+          <span class="cb-text" id="challenge-text"></span>
+        </div>
+
+        <div class="test-stage state-idle" id="test-stage" role="button" tabindex="0" aria-live="polite" aria-label="Reaction time test area">
+          <div class="stage-round-pill" id="stage-round-pill" aria-hidden="true">Round 1 of 8</div>
+          <button type="button" id="stage-cancel-btn" class="stage-cancel" aria-label="Cancel test">&#10005;</button>
+          <div id="stage-content">
+            <p class="stage-title">Green go, red no</p>
+            <p class="stage-sub">Hit Draw. Click on green, hold on red — eight rounds, five of them green.</p>
+          </div>
+        </div>
+      </div>
+      <div class="crt-glare" aria-hidden="true"></div>
+    </div>
+
+    <div class="deck deck--solo">
+      <div class="deck-center" id="stage-controls">
+        <button type="button" id="start-btn" class="start-btn"><span class="start-ring"></span><span class="start-text">Draw!</span></button>
+        <div class="coin-door" aria-hidden="true"><span class="coin-slot"></span>Insert Coin &middot; Free Play</div>
+      </div>
+    </div>
+    <nav class="test-switch" aria-labelledby="test-switch-label">
+      <span class="test-switch-label" id="test-switch-label">The four tests</span>
+      <ul>
+        <li><a href="/">Visual</a></li>
+        <li><a href="/audio-reaction-time-test/">Audio</a></li>
+        <li><a href="/choice-reaction-time-test/" aria-current="page">Go / No-Go</a></li>
+        <li><a href="/f1-reaction-test/">F1 Lights</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <section class="panel panel-narrow" id="results-panel" hidden>
+    <h2>Your results</h2>
+    <div class="rating-banner">
+      <div class="grade-stamp" id="result-grade" aria-hidden="true"></div>
+      <div class="rating-label" id="rating-label"></div>
+      <div class="rating-note" id="rating-note"></div>
+      <div class="rating-percentile" id="rating-percentile"></div>
+    </div>
+    <div class="challenge-verdict" id="challenge-verdict" hidden></div>
+
+    <div class="dist-card" id="dist-card" hidden>
+      <div class="chart-card-title">Where that lands in the published distribution</div>
+      <div id="dist-chart"></div>
+      <p class="dist-source">Modelled from go/no-go go-trial reaction times reported in published research &mdash; <strong>not</strong> from results recorded on this site, which stores nothing off your device. <a href="/reaction-time-percentiles/">See the full table and sources</a>.</p>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-title">Your green rounds</div>
+      <div id="rounds-chart"></div>
+    </div>
+
+    <div class="results-grid">
+      <div class="stat-tile highlight">
+        <div class="stat-label">Average</div>
+        <div class="stat-value" id="result-avg">&mdash;</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-label">Best round</div>
+        <div class="stat-value" id="result-best">&mdash;</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-label">All-time best</div>
+        <div class="stat-value" id="result-alltime-best">&mdash;</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-label">False starts</div>
+        <div class="stat-value" id="result-false-alarms">&mdash;</div>
+      </div>
+    </div>
+
+    <table class="rounds-table visually-hidden">
+      <caption class="visually-hidden">Exact time for each round</caption>
+      <thead><tr><th>Round</th><th class="num">Time</th></tr></thead>
+      <tbody id="rounds-tbody"></tbody>
+    </table>
+
+    <div class="btn-row">
+      <button type="button" id="retry-btn" class="primary">Test again</button>
+      <button type="button" id="copy-btn" class="icon-btn">Copy challenge link</button>
+    </div>
+    <p class="disclaimer">This is a fun, approximate browser-based test &mdash; not a scientific or medical instrument. Your measured time includes your device's screen refresh rate, input latency, and browser/OS rendering delay. The percentile above compares you against a model built from published research, all cited below &mdash; it is not a ranking against other people who have used this site, because no results are ever collected here.</p>
+  </section>
+
+  <section class="panel panel-narrow" id="history-panel">
+    <h2>Your history</h2>
+    <div id="history-empty" class="disclaimer" style="margin-top:0;">No sessions yet &mdash; run the test above to start tracking your history.</div>
+    <div id="history-sparkline" class="sparkline-wrap" hidden></div>
+    <table class="rounds-table" id="history-table" hidden>
+      <thead><tr><th>Date</th><th class="num">Average</th></tr></thead>
+      <tbody id="history-tbody"></tbody>
+    </table>
+  </section>
+
+  <section class="container-narrow" style="padding-top:0;">
+  <h1>Go / No-Go Reaction Test</h1>
+
+  <p>Simple reaction time asks one question: how fast can you respond? A go/no-go
+  task asks a harder one: how fast can you respond <em>when you also have to be
+  ready not to</em>. Eight trials run here, five of them green and three of them
+  red, shuffled so the order is not learnable. Green means click. Red means hold.
+  You get two numbers at the end, and the second one is the interesting one.</p>
+
+  <div class="callout">
+    <strong>Your browser is in the measurement.</strong> Every number on this page
+    is a browser reading, and a browser reads slower than a laboratory. Anwyl-Irvine
+    and colleagues drove research-grade browser platforms with a calibrated robot
+    finger and measured a mean response lag of <strong>78.81ms</strong> (SD 18.51) in
+    Chrome, and 71.3&ndash;87.4ms across platforms. That delay is your screen, your
+    input device and your operating system, and none of it is you. Where this page
+    quotes a figure measured on laboratory equipment it says so and states the
+    correction applied &mdash; a lab number and a browser number are never presented
+    as the same kind of thing.
+  </div>
+
+  <h2 id="two-numbers">The two numbers</h2>
+  <p><strong>Mean go latency</strong> is your average response time across the five
+  green trials &mdash; comparable in kind to the number the
+  <a href="/">visual reaction time test</a> gives you, but slower, because a decision
+  now sits between the stimulus and the movement. You are no longer reacting; you are
+  classifying and then reacting.</p>
+
+  <p><strong>False starts</strong> is a count of how many red trials you responded to
+  anyway. In the research literature these are called <em>commission errors</em>, and
+  they are the whole point of the paradigm: they measure response inhibition, which
+  is a different faculty from speed. The two trade against each other. Push your
+  latency down far enough and you will start clicking on red, because you are no
+  longer waiting to find out what colour it is. That trade-off is visible in your own
+  results across a few sessions, and it is the reason this test reports both numbers
+  instead of averaging them into one score.</p>
+
+  <p>A red trial you correctly held is scored as a win, contributes nothing to your
+  latency, and lights your pip &mdash; nothing happening is the correct outcome, so it
+  is rewarded like one.</p>
+
+  <h2 id="slower">Why go/no-go is slower than simple reaction time</h2>
+  <p>The extra time is a decision stage. On a simple reaction test the stimulus and
+  the required response are known in advance, so the only work is detection. Here the
+  stimulus has to be identified before the response can be selected or withheld, and
+  that identification costs real milliseconds &mdash; typically the difference between
+  a figure in the two-hundreds and one in the three- to four-hundreds.</p>
+
+  <p>Schulz and colleagues measured the non-emotional version of this task &mdash;
+  green square for go, red square for no-go, the same rule used here &mdash; in 85
+  participants. Their mean go reaction time was <strong>362ms</strong> (SD 57).
+  That is a laboratory figure, so putting a browser score next to it needs a
+  correction, and this site applies one explicitly: <strong>362 + 78.81 =
+  441ms</strong>, using Anwyl-Irvine's robot-measured mean Chrome response lag. The
+  spread combines the study's between-subject SD of 57ms with the between-machine SD
+  of that browser lag, 18.51ms, in quadrature: <strong>60ms</strong>. Those two
+  numbers, both published, are the entire model. The derivation lives in
+  <code>assets/js/percentile.js</code> and on the
+  <a href="/reaction-time-percentiles/">percentile reference page</a>.</p>
+
+  <h2 id="errors">About that error rate &mdash; and why yours is not comparable</h2>
+  <p>The same study reports a commission error rate of <strong>8.23%</strong>
+  (SD 7.61) and an omission rate of 0.81% (SD 3.91). It is tempting to hand you those
+  as a benchmark. They are not one, and this page will not use them as one.</p>
+
+  <p>Commission rate is not a property of a person. It is a property of a person
+  <em>and</em> a task, and it moves sharply with two parameters in particular: how
+  often a no-go trial occurs, and how fast the task is paced. Schulz's figures were
+  measured with each stimulus shown for 500ms and 1250&ndash;1750ms between trials
+  &mdash; brisk, unrelenting, and designed to build up a habitual go response that the
+  no-go trial then has to interrupt. This test runs three no-go trials in eight, which
+  is a far higher proportion than a research task uses, and it waits a random two to
+  five seconds before each cue. Both differences make holding easier here. Your false
+  start count and their 8.23% are measurements of different things that happen to
+  share a name.</p>
+
+  <p>So: the go latency gets a percentile, because the model behind it is built on a
+  published mean for this task with a stated correction. The false start count gets a
+  raw number and no percentile, because there is no honest way to produce one. That
+  asymmetry is deliberate. A percentile invented to fill a gap in a table is worse
+  than an empty cell.</p>
+
+  <h2>Frequently asked questions</h2>
+  <div class="faq-item">
+    <h3>What is a good go/no-go reaction time?</h3>
+    <p>Slower than a good simple reaction time, and that is expected rather than a problem &mdash; the extra time is the decision. The model this site uses puts the middle of the distribution around 437ms for a browser measurement, against 273ms for simple visual reaction. A go latency in the high three hundreds with no false starts is a genuinely good result.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Is it better to be fast or to make no mistakes?</h3>
+    <p>They are two different skills and the test reports them separately for that reason. Speed with false starts is not the same achievement as speed without them, and a very low latency accompanied by a couple of commission errors usually means you stopped waiting to find out what colour the cue was.</p>
+  </div>
+  <div class="faq-item">
+    <h3>How many red trials are there?</h3>
+    <p>Three of the eight, shuffled each session so the pattern cannot be learned, and never on the first trial &mdash; the opening trial teaches the rule. That is a higher no-go proportion than a research task would use, which is one of the reasons your error count is not comparable to published error rates.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Is this the same as a choice reaction time test?</h3>
+    <p>It is the closest common relative. A true choice reaction task gives you two or more responses to pick between; go/no-go gives you one response and the option of withholding it. Both add a decision stage on top of simple reaction time, which is why both are slower, and go/no-go is the version that yields a clean inhibition measure.</p>
+  </div>
+
+  <h2 id="sources">Sources</h2>
+  <ul class="source-list">
+    <li>Schulz KP, Fan J, Magidina O, Marks DJ, Hahn B, Halperin JM (2007). Does the
+    emotional go/no-go task really measure behavioral inhibition? Convergence with
+    measures on a non-emotional analog. Archives of Clinical Neuropsychology
+    22(2):151-160.<span class="src-kind">peer-reviewed</span><br>
+    <a href="https://doi.org/10.1016/j.acn.2006.12.001" rel="nofollow noopener" target="_blank">https://doi.org/10.1016/j.acn.2006.12.001</a><br>
+    Non-emotional go/no-go, N = 85, green = go and red = no-go, stimulus 500 ms with a
+    1250-1750 ms inter-stimulus interval. Mean go reaction time 362 ms (SD 57);
+    commission errors 8.23% (SD 7.61); omission errors 0.81% (SD 3.91).</li>
+    <li>Anwyl-Irvine A, Dalmaijer ES, Hodges N, Evershed JK (2021). Realistic precision and accuracy of online experiment platforms, web browsers, and devices. Behavior Research Methods 53(4):1407-1425.<span class="src-kind">peer-reviewed</span><br><a href="https://doi.org/10.3758/s13428-020-01501-5" rel="nofollow noopener" target="_blank">https://doi.org/10.3758/s13428-020-01501-5</a><br>Mean browser response lag measured with a calibrated robot actuator: Chrome 78.81 ms (SD 18.51); 71.3-87.4 ms across the four platforms tested.</li>
+  </ul>
+  <p class="disclaimer">Figures are quoted as published, with the task parameters they
+  belong to. Where this page derives something from them &mdash; the 441ms centre and
+  the 60ms spread &mdash; the arithmetic is shown above rather than presented as a
+  measurement.</p>
+
+  <h2>Related</h2>
+  <div class="faq-item">
+    <h3><a href="/">Visual Reaction Time Test</a></h3>
+    <p>The same green cue with nothing to withhold. The gap between your two scores is the cost of the decision.</p>
+  </div>
+  <div class="faq-item">
+    <h3><a href="/f1-reaction-test/">F1 Reaction Test</a></h3>
+    <p>Five red lights, an unannounced hold, then lights out &mdash; and a jump-start rule with a real citation behind it.</p>
+  </div>
+  <div class="faq-item">
+    <h3><a href="/reaction-time-percentiles/">Reaction Time Percentiles</a></h3>
+    <p>The full distribution, the age bands, and where every figure on this site comes from.</p>
+  </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>&copy; <span id="year"></span> reflexzap.com</div>
+    <div class="footer-links">
+      <a href="/reaction-time-percentiles/">Percentiles</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/nav.js?v=6"></script>
+<a href="https://erabb.it" class="erabbit-mark" aria-label="erabb.it"><img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128007;</text></svg>" width="10" height="10" alt=""></a>
+
+<div class="announce" id="announce" aria-hidden="true"></div>
+<div class="toast" id="toast">Copied!</div>
+<div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
+
+<script src="/assets/js/percentile.js?v=6"></script>
+<script src="/assets/js/app.js?v=6"></script>
+</body>
+</html>

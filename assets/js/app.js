@@ -45,9 +45,38 @@ const PERCENTILE =
   (typeof globalThis !== "undefined" && globalThis.PercentileEngine) ||
   (typeof require === "function" ? require("./percentile.js") : null);
 
-function getPercentileNote(avgMs) {
+function getPercentileNote(avgMs, modelName) {
   if (!PERCENTILE || !Number.isFinite(avgMs)) return "";
-  return PERCENTILE.comparisonText(avgMs, PERCENTILE.REACTION_TIME_MS);
+  const model = PERCENTILE[modelName || "REACTION_TIME_MS"];
+  return model ? PERCENTILE.comparisonText(avgMs, model) : "";
+}
+
+/* Rating band for a test that has no absolute-ms convention of its own.
+   Read off that test's own cited distribution, so the label moves with the
+   model instead of inheriting thresholds picked for a different stimulus. */
+/* Band copy for the percentile-rated tests. The absolute-millisecond notes
+   above name specific ms ranges, which are only meaningful for the visual
+   test they were written for. */
+const PERCENTILE_BAND_NOTES = {
+  "Superhuman": "Inside the fastest 5% of the modelled population for this test — worth a second run to rule out a click that anticipated the cue.",
+  "Excellent": "Inside the fastest fifth of the modelled population for this test.",
+  "Above Average": "Above the middle of the modelled population for this test.",
+  "Average": "Around the middle of the modelled population for this test — an ordinary result.",
+  "Below Average — try again!": "Below the middle today. Fatigue, distraction and device lag each add milliseconds on their own.",
+};
+
+const PERCENTILE_BANDS = [
+  { min: 95, label: "Superhuman" },
+  { min: 80, label: "Excellent" },
+  { min: 55, label: "Above Average" },
+  { min: 25, label: "Average" },
+  { min: 0, label: "Below Average — try again!" },
+];
+
+function getRatingFromPercentile(pct) {
+  if (!Number.isFinite(pct)) return "";
+  for (const band of PERCENTILE_BANDS) if (pct >= band.min) return band.label;
+  return PERCENTILE_BANDS[PERCENTILE_BANDS.length - 1].label;
 }
 
 if (typeof module !== "undefined" && module.exports) {
@@ -56,7 +85,9 @@ if (typeof module !== "undefined" && module.exports) {
     computeBest,
     getRatingLabel,
     RATING_NOTES,
+    PERCENTILE_BAND_NOTES,
     getPercentileNote,
+    getRatingFromPercentile,
   };
 }
 
@@ -65,18 +96,122 @@ if (typeof module !== "undefined" && module.exports) {
 (function () {
   if (typeof document === "undefined") return;
 
-  const ROUNDS = 5;
   const MIN_DELAY_MS = 2000;
   const MAX_DELAY_MS = 5000;
   const TOO_SOON_DISPLAY_MS = 1400;
   const ROUND_RESULT_DISPLAY_MS = 1100;
+  const NOGO_HOLD_MS = 1000;
   const TOAST_DISPLAY_MS = 1800;
   const MAX_HISTORY = 10;
-  const SITE_URL = "https://reflexzap.com/";
-
-  const BEST_KEY = "reflexzap_best_ms";
-  const HISTORY_KEY = "reflexzap_history";
   const THEME_KEY = "reflexzap_theme";
+
+  /* ---------- the four tests ----------
+     One engine, four pages. `data-mode` on <body> selects which stimulus a
+     round waits for; everything that must not bleed between the tests hangs
+     off this object — the cited model the percentile is read from, the
+     localStorage keys, the share URL, the CPU rival's speed. An absent
+     attribute is the original visual test, so index.html needs no change in
+     behaviour and no page can silently fall into the wrong distribution.
+
+     Each test measures a different thing, so each has its own published
+     distribution in percentile.js. Only `visual` keeps the absolute-ms rating
+     bands: they were chosen for simple visual reaction time and mean nothing
+     for a tone or a go/no-go. The other three read their band off their own
+     model's percentile, which is the only rating that stays honest when the
+     underlying distribution moves. */
+  const MODES = {
+    visual: {
+      key: "visual",
+      scored: 5,
+      model: "REACTION_TIME_MS",
+      bestKey: "reflexzap_best_ms",
+      historyKey: "reflexzap_history",
+      url: "https://reflexzap.com/",
+      gamified: true,
+      goWord: "Click!",
+      foulWord: "Too Soon!",
+      rivalBase: 240, rivalSpread: 170,
+      waitHtml:
+        '<p class="stage-title">Wait for green...</p>' +
+        '<p class="stage-sub">Click as soon as the box turns green.</p>',
+      idleHtml:
+        '<p class="stage-title">Ready to test your reflexes?</p>' +
+        '<p class="stage-sub">Click Start, then click the box the instant it turns green.</p>',
+    },
+    audio: {
+      key: "audio",
+      scored: 5,
+      model: "AUDIO_REACTION_TIME_MS",
+      bestKey: "reflexzap_audio_best_ms",
+      historyKey: "reflexzap_audio_history",
+      url: "https://reflexzap.com/audio-reaction-time-test/",
+      gamified: false,
+      goWord: "Click!",
+      foulWord: "Too Soon!",
+      rivalBase: 200, rivalSpread: 150,
+      waitHtml:
+        '<p class="stage-title">Listen...</p>' +
+        '<p class="stage-sub">The screen will not change. Click the instant you hear the tone.</p>',
+      idleHtml:
+        '<p class="stage-title">Ears only</p>' +
+        '<p class="stage-sub">Turn the volume up, hit Draw, then click the instant you hear the tone.</p>',
+    },
+    choice: {
+      key: "choice",
+      scored: 5,
+      nogo: 3,
+      model: "CHOICE_REACTION_TIME_MS",
+      bestKey: "reflexzap_choice_best_ms",
+      historyKey: "reflexzap_choice_history",
+      url: "https://reflexzap.com/choice-reaction-time-test/",
+      gamified: false,
+      goWord: "Go!",
+      foulWord: "False Start!",
+      rivalBase: 320, rivalSpread: 190,
+      waitHtml:
+        '<p class="stage-title">Wait for a colour...</p>' +
+        '<p class="stage-sub">Green means click. Red means do not.</p>',
+      idleHtml:
+        '<p class="stage-title">Green go, red no</p>' +
+        '<p class="stage-sub">Hit Draw. Click on green, hold on red — eight rounds, five of them green.</p>',
+    },
+    f1: {
+      key: "f1",
+      scored: 5,
+      model: "F1_REACTION_TIME_MS",
+      bestKey: "reflexzap_f1_best_ms",
+      historyKey: "reflexzap_f1_history",
+      url: "https://reflexzap.com/f1-reaction-test/",
+      gamified: false,
+      goWord: "Go!",
+      foulWord: "Jump Start!",
+      rivalBase: 210, rivalSpread: 140,
+      /* A response this fast after lights-out was already on its way before
+         the lights went out. World Athletics publishes exactly this threshold
+         for a sprint start (Technical Rules, Book C - C2.1) and it is the only
+         governing-body reaction-time number that exists — the FIA's own rule
+         is about movement, not latency, so it cannot be applied to a click.
+         The constant lives with the other cited figures in percentile.js. */
+      anticipationMs:
+        (PERCENTILE && PERCENTILE.F1_REACTION_TIME_MS &&
+          PERCENTILE.F1_REACTION_TIME_MS.anticipationMs) || 100,
+      waitHtml:
+        '<p class="stage-title">Lights out and away we go</p>' +
+        '<p class="stage-sub">Five lights on, then a hold, then dark. Go on dark.</p>',
+      idleHtml:
+        '<p class="stage-title">On the grid</p>' +
+        '<p class="stage-sub">Hit Draw. Five red lights come on one by one — react the instant they all go out.</p>',
+    },
+  };
+
+  const MODE =
+    MODES[(document.body && document.body.getAttribute("data-mode")) || "visual"] ||
+    MODES.visual;
+
+  const ROUNDS = MODE.scored;
+  const SITE_URL = MODE.url;
+  const BEST_KEY = MODE.bestKey;
+  const HISTORY_KEY = MODE.historyKey;
 
   /* ---------- theme toggle ---------- */
   (function initTheme() {
@@ -334,16 +469,16 @@ if (typeof module !== "undefined" && module.exports) {
     return audioCtx;
   }
 
-  function playTone(freq, startOffset, duration, type, peakGain) {
-    if (soundMuted) return;
+  // One oscillator, scheduled at an absolute AudioContext time. Split out of
+  // playTone so the audio test's cue can use it while bypassing the effects
+  // mute — that tone is not an effect, it is the stimulus being measured.
+  function toneAt(freq, t0, duration, type, peakGain) {
     const ctx = getAudioCtx();
     if (!ctx) return;
-    if (ctx.state === "suspended") ctx.resume();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = type || "sine";
     osc.frequency.value = freq;
-    const t0 = ctx.currentTime + startOffset;
     gain.gain.setValueAtTime(0, t0);
     gain.gain.linearRampToValueAtTime(peakGain || 0.08, t0 + 0.015);
     gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
@@ -351,6 +486,43 @@ if (typeof module !== "undefined" && module.exports) {
     gain.connect(ctx.destination);
     osc.start(t0);
     osc.stop(t0 + duration + 0.02);
+  }
+
+  function playTone(freq, startOffset, duration, type, peakGain) {
+    if (soundMuted) return;
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume();
+    toneAt(freq, ctx.currentTime + startOffset, duration, type, peakGain);
+  }
+
+  /* The audio test's stimulus. Returns the performance.now() instant the tone
+     will actually be audible, which is what the reaction is measured from.
+
+     Scheduling it a fixed lead ahead of ctx.currentTime is what stops the
+     attack being clipped by scheduling jitter; getOutputTimestamp() then maps
+     that AudioContext instant onto the performance.now() clock, and it is the
+     only API that accounts for the buffer the samples still have to travel
+     through before anyone hears them. Where it is missing, outputLatency (or
+     baseLatency) is the documented fallback. Taking performance.now() at the
+     moment we *schedule* the note would credit the player with the whole
+     output latency — tens of milliseconds of free reaction time. */
+  const CUE_LEAD_S = 0.09;
+
+  function playCueTone() {
+    const now = performance.now();
+    const ctx = getAudioCtx();
+    if (!ctx) return now;
+    if (ctx.state === "suspended") ctx.resume();
+    const t0 = ctx.currentTime + CUE_LEAD_S;
+    toneAt(1000, t0, 0.13, "square", 0.14);
+    const ts = ctx.getOutputTimestamp ? ctx.getOutputTimestamp() : null;
+    if (ts && Number.isFinite(ts.contextTime) && Number.isFinite(ts.performanceTime) &&
+        ts.contextTime > 0 && ts.performanceTime > 0) {
+      return ts.performanceTime + (t0 - ts.contextTime) * 1000;
+    }
+    const lag = ctx.outputLatency || ctx.baseLatency || 0;
+    return now + (CUE_LEAD_S + lag) * 1000;
   }
 
   function playClickBlip() { playTone(880, 0, 0.09, "sine", 0.06); }
@@ -398,6 +570,8 @@ if (typeof module !== "undefined" && module.exports) {
 
   const stageRoundPill = document.getElementById("stage-round-pill");
   const cancelBtn = document.getElementById("stage-cancel-btn");
+  const lightsEl = document.getElementById("f1-lights");
+  const falseAlarmTile = document.getElementById("result-false-alarms");
 
   const resultsPanel = document.getElementById("results-panel");
   const ratingLabelEl = document.getElementById("rating-label");
@@ -439,13 +613,37 @@ if (typeof module !== "undefined" && module.exports) {
     clearTimeout(announceTimer);
     announceTimer = setTimeout(() => announceEl.classList.remove("show"), 850);
   }
+  const GRADE_FOR_LABEL = {
+    "Superhuman": "S",
+    "Excellent": "A",
+    "Above Average": "B",
+    "Average": "C",
+    "Below Average — try again!": "D",
+  };
+
   function gradeForAvg(avg) {
     if (!Number.isFinite(avg)) return "E";
+    // The four tests share one ladder but not one scale, so the letter comes
+    // from whichever rating rule this mode uses — absolute milliseconds on the
+    // visual test, its own cited percentile everywhere else.
+    if (MODE.key !== "visual") return GRADE_FOR_LABEL[ratingFor(avg)] || "D";
     if (avg < 200) return "S";
     if (avg < 250) return "A";
     if (avg < 300) return "B";
     if (avg < 350) return "C";
     return "D";
+  }
+
+  function percentileFor(avg) {
+    const model = PERCENTILE && PERCENTILE[MODE.model];
+    if (!model || !Number.isFinite(avg)) return NaN;
+    return PERCENTILE.percentileForScore(avg, model);
+  }
+
+  function ratingFor(avg) {
+    if (MODE.key === "visual") return getRatingLabel(avg);
+    const pct = percentileFor(avg);
+    return Number.isFinite(pct) ? getRatingFromPercentile(pct) : getRatingLabel(avg);
   }
   function showGrade(avg) {
     if (!resultGrade) return;
@@ -461,32 +659,61 @@ if (typeof module !== "undefined" && module.exports) {
   // pip lights, else the rival's does. Pure flavour on top of the real timing.
   const pipsYou = document.getElementById("pips-you");
   const pipsRival = document.getElementById("pips-rival");
-  function buildPips(el) {
+  function buildPips(el, n) {
     if (!el) return;
     el.innerHTML = "";
-    for (var i = 0; i < 5; i++) { var p = document.createElement("span"); p.className = "pip"; el.appendChild(p); }
+    for (var i = 0; i < n; i++) { var p = document.createElement("span"); p.className = "pip"; el.appendChild(p); }
   }
-  function resetPips() { buildPips(pipsYou); buildPips(pipsRival); }
+  function resetPips() {
+    const n = sequence.length;
+    buildPips(pipsYou, n);
+    buildPips(pipsRival, n);
+  }
   function lightPip(idx, youWin) {
     var el = youWin ? pipsYou : pipsRival;
     if (el && el.children[idx]) el.children[idx].className = "pip " + (youWin ? "win" : "loss");
   }
 
-  const IDLE_CONTENT_HTML =
-    '<p class="stage-title">Ready to test your reflexes?</p>' +
-    '<p class="stage-sub">Click Start, then click the box the instant it turns green.</p>';
+  const IDLE_CONTENT_HTML = MODE.idleHtml;
 
   const FINISH_TRANSITION_MS = 220;
 
   /* ---------- state ---------- */
-  let state = "idle"; // idle | waiting | ready | toosoon | round-result | done
-  let currentRound = 0;
-  let roundTimes = [];
+  let state = "idle"; // idle | waiting | ready | nogo | toosoon | round-result | done
+  let trialIndex = 0;          // position in `sequence`, not the scored count
+  let roundTimes = [];         // scored go-trial latencies only
+  let falseAlarms = 0;         // go/no-go: responses on a no-go trial
   let greenAt = 0;
   let waitTimeoutId = null;
+  let readyTimeoutId = null;
+  let lightsTimeoutId = null;
   let advanceTimeoutId = null;
   let toastTimeoutId = null;
   let earlyClickCount = 0;
+
+  /* The trial order for a session. Every test but go/no-go is N identical
+     scored trials; go/no-go interleaves three no-go trials that are scored on
+     whether you managed *not* to respond, which is the second measured number
+     this site has never had. Shuffled per session so the pattern is not
+     learnable, and built once per session so the pip row and the round labels
+     agree with what is actually coming. */
+  function buildSequence() {
+    const out = [];
+    for (let i = 0; i < MODE.scored; i++) out.push("go");
+    for (let i = 0; i < (MODE.nogo || 0); i++) out.push("nogo");
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = out[i]; out[i] = out[j]; out[j] = tmp;
+    }
+    // Never open on a no-go: the first trial teaches the rule.
+    if (out[0] === "nogo") {
+      const firstGo = out.indexOf("go");
+      out[0] = "go"; out[firstGo] = "nogo";
+    }
+    return out;
+  }
+
+  let sequence = buildSequence();
 
   function randomDelay() {
     return MIN_DELAY_MS + Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS);
@@ -494,10 +721,17 @@ if (typeof module !== "undefined" && module.exports) {
 
   function setStageState(cls) {
     stageEl.classList.remove(
-      "state-idle", "state-waiting", "state-ready",
+      "state-idle", "state-waiting", "state-ready", "state-nogo",
       "state-toosoon", "state-result", "state-done"
     );
     stageEl.classList.add(cls);
+  }
+
+  /* F1 start gantry. One className write per step — the lights-out frame is
+     the measured stimulus, so it must not cost five separate style mutations
+     and it must not touch layout at all. */
+  function setLights(n) {
+    if (lightsEl) lightsEl.className = "f1-lights lit-" + n;
   }
 
   // Replaces the stage message and restarts its entrance animation so every
@@ -517,7 +751,7 @@ if (typeof module !== "undefined" && module.exports) {
   }
 
   function updateRoundLabel(text) {
-    const label = text || `Round ${currentRound + 1} of ${ROUNDS}`;
+    const label = text || `Round ${trialIndex + 1} of ${sequence.length}`;
     roundLabel.textContent = label;
     if (stageRoundPill) stageRoundPill.textContent = label;
   }
@@ -542,17 +776,22 @@ if (typeof module !== "undefined" && module.exports) {
 
   function clearTimers() {
     if (waitTimeoutId) { clearTimeout(waitTimeoutId); waitTimeoutId = null; }
+    if (readyTimeoutId) { clearTimeout(readyTimeoutId); readyTimeoutId = null; }
+    if (lightsTimeoutId) { clearTimeout(lightsTimeoutId); lightsTimeoutId = null; }
     if (advanceTimeoutId) { clearTimeout(advanceTimeoutId); advanceTimeoutId = null; }
   }
 
   function startTest() {
     clearTimers();
-    currentRound = 0;
+    sequence = buildSequence();
+    trialIndex = 0;
     roundTimes = [];
+    falseAlarms = 0;
     earlyClickCount = 0;
     resultsPanel.hidden = true;
     stageControls.hidden = true;
     resetPips();
+    setLights(0);
     enterFullBleed();
     beginRound();
   }
@@ -561,33 +800,91 @@ if (typeof module !== "undefined" && module.exports) {
     state = "waiting";
     setStageState("state-waiting");
     updateRoundLabel();
-    const rn = currentRound + 1;
-    showAnnounce(rn >= ROUNDS ? "Final Round" : "Round " + rn);
-    setStageContentHTML(
-      '<p class="stage-title">Wait for green...</p>' +
-      '<p class="stage-sub">Click as soon as the box turns green.</p>'
-    );
-    const delay = randomDelay();
-    waitTimeoutId = setTimeout(() => {
-      waitTimeoutId = null;
-      state = "ready";
-      greenAt = performance.now();
-      setStageState("state-ready");
-      setStageContentHTML('<p class="stage-title">Click!</p>');
-    }, delay);
+    const rn = trialIndex + 1;
+    showAnnounce(rn >= sequence.length ? "Final Round" : "Round " + rn);
+    setStageContentHTML(MODE.waitHtml);
+    if (MODE.key === "f1") { runLightsSequence(); return; }
+    waitTimeoutId = setTimeout(fireCue, randomDelay());
   }
 
-  function handleTooSoon() {
+  /* The FIA start procedure: five lights come on one per second, hold for an
+     unannounced interval, then all go out at once. Lights-out is the cue, so
+     the hold has to be unpredictable — the published range for a real start
+     is roughly 0.2 to 3 seconds. */
+  const F1_LIGHT_STEP_MS = 1000;
+  const F1_HOLD_MIN_MS = 200;
+  const F1_HOLD_MAX_MS = 3000;
+
+  function runLightsSequence() {
+    setLights(0);
+    let lit = 0;
+    (function step() {
+      lightsTimeoutId = setTimeout(() => {
+        lightsTimeoutId = null;
+        lit += 1;
+        setLights(lit);
+        playTone(440, 0, 0.06, "square", 0.05);
+        if (lit < 5) { step(); return; }
+        waitTimeoutId = setTimeout(() => {
+          waitTimeoutId = null;
+          // Timestamp first, then the single className write — the same order
+          // the visual test uses, so the two numbers stay comparable.
+          greenAt = performance.now();
+          state = "ready";
+          setLights(0);
+        }, F1_HOLD_MIN_MS + Math.random() * (F1_HOLD_MAX_MS - F1_HOLD_MIN_MS));
+      }, F1_LIGHT_STEP_MS);
+    })();
+  }
+
+  function fireCue() {
+    waitTimeoutId = null;
+    if (sequence[trialIndex] === "nogo") {
+      state = "nogo";
+      setStageState("state-nogo");
+      setStageContentHTML(
+        '<p class="stage-title">Hold!</p>' +
+        '<p class="stage-sub">Red — do not click. Wait it out.</p>'
+      );
+      advanceTimeoutId = setTimeout(() => {
+        advanceTimeoutId = null;
+        passNoGo();
+      }, NOGO_HOLD_MS);
+      return;
+    }
+
+    if (MODE.key === "audio") {
+      // The stimulus is the sound. Nothing on screen may change here: a visual
+      // change would leak a second cue and would put layout work in the path
+      // being measured. `ready` is armed at the tone's real onset, not when it
+      // was scheduled, so a click in between still counts as too soon.
+      greenAt = playCueTone();
+      const lead = Math.max(0, greenAt - performance.now());
+      readyTimeoutId = setTimeout(() => {
+        readyTimeoutId = null;
+        state = "ready";
+      }, lead);
+      return;
+    }
+
+    greenAt = performance.now();
+    state = "ready";
+    setStageState("state-ready");
+    setStageContentHTML(`<p class="stage-title">${MODE.goWord}</p>`);
+  }
+
+  function handleTooSoon(subHtml) {
     clearTimers();
     earlyClickCount += 1;
     state = "toosoon";
     setStageState("state-toosoon");
+    setLights(0);
     triggerShake(stageEl);
     playTooSoonBuzz();
-    showAnnounce("Too Soon!", true);
+    showAnnounce(MODE.foulWord, true);
     setStageContentHTML(
       '<p class="stage-title">Not yet!</p>' +
-      '<p class="stage-sub">You clicked before it turned green — wait for it next time.</p>'
+      (subHtml || '<p class="stage-sub">You went before the cue — that round restarts.</p>')
     );
     advanceTimeoutId = setTimeout(() => {
       advanceTimeoutId = null;
@@ -595,25 +892,70 @@ if (typeof module !== "undefined" && module.exports) {
     }, TOO_SOON_DISPLAY_MS);
   }
 
+  // Go/no-go only: the red trial ran its course untouched. Scored as a win,
+  // but it contributes no latency — the whole point is that nothing happened.
+  function passNoGo() {
+    lightPip(trialIndex, true);
+    state = "round-result";
+    setStageState("state-result");
+    setStageContentHTML(
+      '<p class="stage-title">Held</p>' +
+      `<p class="stage-sub">Round ${trialIndex + 1} of ${sequence.length}</p>`
+    );
+    advanceTrial();
+  }
+
+  // Go/no-go only: a response on a red trial. Counted, never timed.
+  function handleFalseAlarm() {
+    clearTimers();
+    falseAlarms += 1;
+    lightPip(trialIndex, false);
+    playTooSoonBuzz();
+    showAnnounce(MODE.foulWord, true);
+    state = "round-result";
+    setStageState("state-toosoon");
+    triggerShake(stageEl);
+    setStageContentHTML(
+      '<p class="stage-title">False start</p>' +
+      '<p class="stage-sub">That one was red — you were meant to hold.</p>'
+    );
+    advanceTrial();
+  }
+
   function handleClickWhileReady() {
     const rawElapsed = performance.now() - greenAt;
     const elapsed = Math.max(0, Math.round(Number.isFinite(rawElapsed) ? rawElapsed : 0));
+
+    // Anticipation, not reaction — the F1 test is the one mode where guessing
+    // the cue is worth attempting, so it is the one mode that rules on it.
+    // Scoring a 40ms "reaction" would put a physically impossible number into
+    // the average and onto the percentile curve.
+    if (MODE.anticipationMs && elapsed < MODE.anticipationMs) {
+      handleTooSoon(
+        `<p class="stage-sub">${elapsed}ms is faster than a human start — that is an ` +
+        `anticipated getaway, not a reaction. Round restarts.</p>`
+      );
+      return;
+    }
+
     roundTimes.push(elapsed);
-    lightPip(currentRound, elapsed < 240 + Math.random() * 170);
+    lightPip(trialIndex, elapsed < MODE.rivalBase + Math.random() * MODE.rivalSpread);
     playClickBlip();
 
     state = "round-result";
     setStageState("state-result");
     setStageContentHTML(
       `<p class="stage-time">${elapsed}ms</p>` +
-      `<p class="stage-sub">Round ${currentRound + 1} of ${ROUNDS}</p>`
+      `<p class="stage-sub">Round ${trialIndex + 1} of ${sequence.length}</p>`
     );
+    advanceTrial();
+  }
 
-    currentRound += 1;
-
+  function advanceTrial() {
+    trialIndex += 1;
     advanceTimeoutId = setTimeout(() => {
       advanceTimeoutId = null;
-      if (currentRound >= ROUNDS) {
+      if (trialIndex >= sequence.length) {
         finishSession();
       } else {
         beginRound();
@@ -623,6 +965,7 @@ if (typeof module !== "undefined" && module.exports) {
 
   function handleStageActivate() {
     if (state === "waiting") { handleTooSoon(); return; }
+    if (state === "nogo") { handleFalseAlarm(); return; }
     if (state === "ready") { handleClickWhileReady(); return; }
     // idle / toosoon / round-result / done: ignore extra activations
   }
@@ -630,9 +973,11 @@ if (typeof module !== "undefined" && module.exports) {
   function cancelTest() {
     clearTimers();
     state = "idle";
+    trialIndex = 0;
     exitFullBleed();
     setStageState("state-idle");
-    updateRoundLabel("Round 1 of 5");
+    setLights(0);
+    updateRoundLabel(`Round 1 of ${sequence.length}`);
     setStageContentHTML(IDLE_CONTENT_HTML);
     stageControls.hidden = false;
   }
@@ -671,27 +1016,37 @@ if (typeof module !== "undefined" && module.exports) {
       renderChallengeVerdict(avg);
       renderHistory(trimmed);
 
-      const gameResult = recordSession({
-        avg,
-        isNewBest,
-        isFirstBest: prevBest === null,
-        flawless: earlyClickCount === 0,
-        now: new Date(),
-      });
-      renderStatusChips(gameResult.profile);
-      renderAchievements(gameResult.profile);
+      // XP, streaks and achievements belong to the visual test alone. Their
+      // thresholds ("average under 200ms") were picked for that stimulus, and
+      // a tone or a lights-out start clears them far more easily — one shared
+      // profile would quietly turn the badges into participation trophies.
+      const gameResult = MODE.gamified
+        ? recordSession({
+            avg,
+            isNewBest,
+            isFirstBest: prevBest === null,
+            flawless: earlyClickCount === 0,
+            now: new Date(),
+          })
+        : null;
+      if (gameResult) {
+        renderStatusChips(gameResult.profile);
+        renderAchievements(gameResult.profile);
+      }
 
       if (isNewBest && prevBest !== null) {
         const avgTile = document.getElementById("result-avg");
         if (avgTile) avgTile.closest(".stat-tile").classList.add("new-record");
         playNewBestSparkle();
       }
-      if (gameResult.leveledUp) {
+      if (gameResult && gameResult.leveledUp) {
         setTimeout(playLevelUpFanfare, gameResult.newlyUnlocked.length ? 700 : 0);
       }
-      queueUnlockToasts(gameResult.newlyUnlocked, () =>
-        gameResult.leveledUp ? "Achievement Unlocked · LV " + gameResult.newLevel : "Achievement Unlocked"
-      );
+      if (gameResult) {
+        queueUnlockToasts(gameResult.newlyUnlocked, () =>
+          gameResult.leveledUp ? "Achievement Unlocked · LV " + gameResult.newLevel : "Achievement Unlocked"
+        );
+      }
 
       resultsPanel.hidden = false;
       resultsPanel.classList.remove("panel-enter");
@@ -703,10 +1058,18 @@ if (typeof module !== "undefined" && module.exports) {
   }
 
   function renderResults(avg, best, allTimeBest) {
-    const label = getRatingLabel(avg);
+    const label = ratingFor(avg);
+    const notes = MODE.key === "visual" ? RATING_NOTES : PERCENTILE_BAND_NOTES;
     ratingLabelEl.textContent = label;
-    ratingNoteEl.textContent = RATING_NOTES[label] || "";
-    ratingPercentileEl.textContent = getPercentileNote(avg);
+    ratingNoteEl.textContent = notes[label] || "";
+    ratingPercentileEl.textContent = getPercentileNote(avg, MODE.model);
+
+    // Go/no-go's second measured number: how often you responded to a red
+    // trial. Nothing else on this site has ever reported an error count.
+    if (falseAlarmTile) {
+      falseAlarmTile.textContent = `${falseAlarms} / ${MODE.nogo || 0}`;
+      falseAlarmTile.closest(".stat-tile").classList.toggle("is-bad", falseAlarms > 0);
+    }
 
     resultAvgEl.textContent = `${avg}ms`;
     resultBestEl.textContent = `${best}ms`;
@@ -730,7 +1093,8 @@ if (typeof module !== "undefined" && module.exports) {
       distCard.hidden = true;
       return;
     }
-    const model = PERCENTILE.REACTION_TIME_MS;
+    const model = PERCENTILE[MODE.model];
+    if (!model) { distCard.hidden = true; return; }
     const geom = {
       width: 320, height: 136,
       padTop: 30, padBottom: 26, padLeft: 10, padRight: 10,
@@ -760,7 +1124,7 @@ if (typeof module !== "undefined" && module.exports) {
     distCard.hidden = false;
     distChart.innerHTML =
       `<svg viewBox="0 0 ${geom.width} ${geom.height}" class="dist-svg" role="img" ` +
-      `aria-label="Modelled distribution of simple visual reaction times from published studies. ` +
+      `aria-label="Modelled distribution of ${model.label.toLowerCase()} from published studies. ` +
       `Your ${avg} millisecond average is faster than ${pct}% of that modelled population.">` +
       `<path class="dist-area" d="${areaAll}" />` +
       `<path class="dist-area dist-area--beaten" d="${areaBeaten}" />` +
@@ -873,6 +1237,7 @@ if (typeof module !== "undefined" && module.exports) {
 
   function renderHistory(list) {
     renderSparkline(list);
+    if (!historyEmpty || !historyTable || !historyTbody) return;
     if (!list.length) {
       historyEmpty.hidden = false;
       historyTable.hidden = true;
@@ -1018,6 +1383,8 @@ if (typeof module !== "undefined" && module.exports) {
   /* ---------- init ---------- */
   applyChallenge();
   resetPips();
+  setLights(0);
+  updateRoundLabel(`Round 1 of ${sequence.length}`);
   renderBestChip();
   renderHistory(loadHistory());
   renderStatusChips(loadProfile());

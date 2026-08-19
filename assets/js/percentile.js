@@ -345,8 +345,42 @@
       used:
         "Response-time lag of browser-based experiment platforms, measured with a " +
         "calibrated robot actuator whose own initiation latency was accounted for: " +
-        "platform means 71.3-87.4 ms; by browser, Safari 76.5 ms to Firefox 82.3 ms; " +
-        "by system, Windows laptop 73.7 ms to macOS desktop 85.4 ms.",
+        "platform means 71.3-87.4 ms; by browser, Chrome 78.81 ms (SD 18.51), and " +
+        "across browsers Safari 76.5 ms to Firefox 82.3 ms; by system, Windows " +
+        "laptop 73.7 ms to macOS desktop 85.4 ms.",
+    },
+    {
+      id: "jain2015",
+      citation:
+        "Jain A, Bansal R, Kumar A, Singh KD (2015). A comparative study of visual and " +
+        "auditory reaction times on the basis of gender and physical activity levels of " +
+        "medical first year students. International Journal of Applied and Basic Medical " +
+        "Research 5(2):124-127.",
+      url: "https://doi.org/10.4103/2229-516X.157168",
+      kind: "peer-reviewed",
+      used:
+        "Visual and auditory simple reaction time measured in the same 120 subjects on " +
+        "the same apparatus: visual 247.60 ms (SD 18.54), auditory 228.01 ms (SD 16.49). " +
+        "Each subject's score is the fastest of five readings, not a mean, so the " +
+        "absolute levels are faster than a mean-based figure would be — only the " +
+        "difference and the ratio between the two conditions are used here.",
+    },
+    {
+      id: "schulz2007",
+      citation:
+        "Schulz KP, Fan J, Magidina O, Marks DJ, Hahn B, Halperin JM (2007). Does the " +
+        "emotional go/no-go task really measure behavioral inhibition? Convergence with " +
+        "measures on a non-emotional analog. Archives of Clinical Neuropsychology " +
+        "22(2):151-160.",
+      url: "https://doi.org/10.1016/j.acn.2006.12.001",
+      kind: "peer-reviewed",
+      used:
+        "Non-emotional go/no-go task, N = 85, green square = go and red square = no-go, " +
+        "stimulus shown for 500 ms with an inter-stimulus interval of 1250-1750 ms. Mean " +
+        "go reaction time 362 ms (SD 57); commission errors (responses on a no-go trial) " +
+        "8.23% (SD 7.61); omission errors 0.81% (SD 3.91). The error rates belong to " +
+        "those task parameters and are quoted only alongside them — commission rate moves " +
+        "with the proportion of no-go trials and with pacing.",
     },
   ];
 
@@ -419,8 +453,203 @@
     quantiles: [], // filled below from the model itself, never hand-written
   };
 
-  REACTION_TIME_MS.quantiles = [99, 95, 90, 75, 50, 25, 10, 5, 1].map(function (p) {
-    return { percentile: p, ms: Math.round(scoreForPercentile(p, REACTION_TIME_MS)) };
+  /* ============ THE THREE SIBLING TESTS ============
+
+     Each of the other tests on this site measures a different thing, so each
+     needs its own distribution. The rule from the top of the file still holds:
+     two published numbers per model, no free parameters, and nothing derived
+     from anyone's score on this site.
+
+     A NOTE THAT APPLIES TO ALL THREE, AND THAT EVERY PAGE BUILT ON THEM HAS TO
+     REPEAT: a browser reads slower than a laboratory. Anwyl-Irvine et al. drove
+     research-grade browser platforms with a calibrated robot finger and measured
+     a mean response lag of 78.81 ms (SD 18.51) in Chrome, 71.3-87.4 ms across
+     platforms. The visual model above needs no correction for that because it is
+     anchored on a browser dataset to begin with. The two models below that are
+     anchored on laboratory means DO, and the correction is applied explicitly and
+     named, never quietly folded in.
+  */
+
+  /* ---------------- AUDIO: simple auditory reaction time ----------------
+
+     Anchored by SHIFTING the visual model, not by importing a lab mean.
+
+     [jain2015] measured both stimuli in the SAME 120 subjects on the SAME
+     apparatus: visual 247.60 ms (SD 18.54), auditory 228.01 ms (SD 16.49).
+     Those absolute values cannot be used directly — their score is each
+     subject's FASTEST of five readings rather than a mean, which is a different
+     statistic from anything this site reports, and it was collected on lab
+     equipment rather than through a browser. What survives both differences is
+     the WITHIN-SUBJECT CONTRAST between the two conditions, because the
+     apparatus, the scoring rule and the people are identical on both sides of
+     it.
+
+     LOCATION: auditory advantage = 247.60 - 228.01 = 19.59 ms, applied to the
+     visual model's browser-scale median:  273 - 19.59 = 253.4  ->  253 ms.
+     (19.59 ms sits inside the 20-30 ms advantage that is the defensible range
+     for this contrast. Some sources quote much larger gaps; those compare
+     figures collected on different apparatus and are not used.)
+
+     SPREAD: the same study's SD ratio between the two conditions,
+     16.49 / 18.54 = 0.8894, applied to the visual model's derived SD:
+     38 * 0.8894 = 33.8  ->  34 ms.
+
+     LIMITATION, stated rather than corrected: audio output adds its own latency
+     that a screen does not, and this model does not account for it. The engine
+     does — it timestamps the tone's real onset via getOutputTimestamp() rather
+     than the moment the note was scheduled — but device audio buffering still
+     varies more between machines than display timing does. */
+
+  var AUDIO_REACTION_TIME_MS = {
+    id: "simple-auditory-rt-ms",
+    label: "Simple auditory reaction time, 5-round browser average",
+    unit: "ms",
+    precision: 0,
+    lowerIsBetter: true,
+    betterWord: "Faster",
+    populationPhrase: "the population in published reaction-time data",
+    source: "jain2015",
+
+    median: 253, // 273 - 19.59, see derivation above
+    sd: 34, // 38 * (16.49 / 18.54)
+    shift: 0,
+    domain: [150, 430],
+
+    /* Printed on the page as the size of the effect being modelled. */
+    auditoryAdvantageMs: 19.6,
+    quantiles: [],
+  };
+
+  /* ---------------- CHOICE: go/no-go go-trial latency ----------------
+
+     LOCATION: [schulz2007] mean go reaction time 362 ms (SD 57) over N = 85,
+     on the non-emotional green-go / red-no-go analog — the same rule this
+     site's test uses. That is a LABORATORY figure, so it has to be put on
+     browser footing before a browser score is compared to it:
+
+       362 + 78.81 = 440.8  ->  441 ms
+
+     where 78.81 ms is [anwylirvine2021]'s measured mean Chrome response lag.
+     This is a deliberately larger correction than the 42 ms the age-band table
+     on the percentile page applies, and the two are not interchangeable: 42 ms
+     is the observed gap between one lab study's mean and one web dataset's
+     median, so it carries the difference between those two POPULATIONS as well
+     as the difference between their equipment. 78.81 ms is a robot-measured
+     hardware-and-software lag with no population in it, which is the right
+     quantity when the only thing that needs converting is the medium. Its own
+     spread across platforms (71.3-87.4 ms) is roughly +/- 8 ms on this model's
+     centre, so treat percentiles here as accurate to a few points, not exactly.
+
+     SPREAD: the between-subject SD of go-trial mean RT, 57 ms, combined in
+     quadrature with the between-configuration SD of that browser lag, 18.51 ms,
+     because a browser population really does sit on a spread of hardware:
+       sqrt(57^2 + 18.51^2) = 59.9  ->  60 ms
+
+     LIMITATIONS, stated rather than papered over. Schulz's task is faster-paced
+     than this one (500 ms stimulus, 1250-1750 ms between trials, versus a 2-5 s
+     random wait here), and a slower pace generally reads slower. And a 5-trial
+     average carries sampling noise that a full task's mean does not; no
+     intraindividual SD is published for this task, so unlike the visual model
+     that term is absent here rather than estimated. The spread below is
+     therefore, if anything, slightly narrow.
+
+     The false-alarm count the test reports is NOT modelled. [schulz2007]'s
+     8.23% commission rate belongs to that study's stimulus timing and no-go
+     proportion; this test uses three no-go trials in eight, which is a far
+     higher no-go rate than a research task uses, so the two rates are not
+     comparable and no percentile is offered for that number. */
+
+  var CHOICE_REACTION_TIME_MS = {
+    id: "go-nogo-rt-ms",
+    label: "Go/no-go go-trial reaction time, browser average",
+    unit: "ms",
+    precision: 0,
+    lowerIsBetter: true,
+    betterWord: "Faster",
+    populationPhrase: "the population in published go/no-go data",
+    source: "schulz2007",
+
+    mean: 441, // 362 [schulz2007] + 78.81 [anwylirvine2021]
+    sd: 60, // sqrt(57^2 + 18.51^2)
+    shift: 0,
+    domain: [270, 690],
+
+    /* Quoted on the page only together with the task parameters they belong
+       to — see the LIMITATIONS note above. */
+    labMeanMs: 362,
+    labSdMs: 57,
+    browserLagMs: 78.81,
+    commissionPct: 8.23,
+    commissionSdPct: 7.61,
+    omissionPct: 0.81,
+    omissionSdPct: 3.91,
+    n: 85,
+    quantiles: [],
+  };
+
+  /* ---------------- F1: lights-out start reaction ----------------
+
+     This model deliberately carries the SAME TWO NUMBERS as the visual model,
+     and that is the finding, not a shortcut.
+
+     No governing body publishes a distribution of start reaction times. The FIA
+     Formula 1 Sporting Regulations define a false start as MOVEMENT before the
+     signal (2025 regulations, Art. 44.10(b) and 48.1(a)) — there is no reaction
+     time threshold anywhere in them, and no primary source publishes a "record"
+     start reaction time either. Inventing parameters to fill that gap is exactly
+     what the header of this file forbids.
+
+     What the test actually measures is a click in response to a screen going
+     dark, which is simple visual reaction time — the thing the model at the top
+     of this file already describes from cited sources. So the honest model is
+     that one, relabelled, and the page says so in as many words.
+
+     WHAT IT DOES NOT CAPTURE, stated on the page: the five-light countdown is a
+     warning signal, and the hold that follows is short (0.2-3 s) compared with
+     the unwarned 2-5 s wait the visual test uses. A warned foreperiod usually
+     produces faster responses, and it also makes anticipation worth attempting.
+     Both effects are real and neither is quantified here, because no figure for
+     them traceable to this test's exact procedure exists. Read an F1 percentile
+     as "where this reading would sit on the general simple-visual-reaction-time
+     curve", which is literally what it is.
+
+     The engine's 100 ms anticipation cutoff is NOT from this model. It is World
+     Athletics' published threshold for a sprint start (Technical Rules, Book C,
+     C2.1) — the one governing body that does publish a reaction-time number. */
+
+  var F1_REACTION_TIME_MS = {
+    id: "f1-lights-out-rt-ms",
+    label: "Lights-out start reaction, 5-round browser average",
+    unit: "ms",
+    precision: 0,
+    lowerIsBetter: true,
+    betterWord: "Faster",
+    populationPhrase: "the population in published reaction-time data",
+    source: "humanbenchmark",
+
+    median: 273, // identical to the visual model, by the reasoning above
+    sd: 38,
+    shift: 0,
+    domain: [140, 450],
+
+    /* World Athletics Technical Rules, Book C - C2.1: a start reaction under
+       0.100 s is ruled an anticipation rather than a reaction. The engine uses
+       this on the F1 test only, and the page cites it there. */
+    anticipationMs: 100,
+    quantiles: [],
+  };
+
+  var MODELS = [
+    REACTION_TIME_MS,
+    AUDIO_REACTION_TIME_MS,
+    CHOICE_REACTION_TIME_MS,
+    F1_REACTION_TIME_MS,
+  ];
+
+  MODELS.forEach(function (model) {
+    model.quantiles = [99, 95, 90, 75, 50, 25, 10, 5, 1].map(function (p) {
+      return { percentile: p, ms: Math.round(scoreForPercentile(p, model)) };
+    });
   });
 
   return {
@@ -444,6 +673,10 @@
     lognormalParams: lognormalParams,
     // site data
     SOURCES: SOURCES,
+    MODELS: MODELS,
     REACTION_TIME_MS: REACTION_TIME_MS,
+    AUDIO_REACTION_TIME_MS: AUDIO_REACTION_TIME_MS,
+    CHOICE_REACTION_TIME_MS: CHOICE_REACTION_TIME_MS,
+    F1_REACTION_TIME_MS: F1_REACTION_TIME_MS,
   };
 });

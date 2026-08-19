@@ -19,7 +19,7 @@
 <meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
 
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/styles.css?v=5">
+<link rel="stylesheet" href="/assets/css/styles.css?v=6">
 <script>try{var t=localStorage.getItem("reflexzap_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 
 <script type="application/ld+json">
@@ -60,28 +60,41 @@
 <!-- nav:start -->
 <nav class="toolbar" aria-label="Tools">
   <details class="tb-menu">
-    <summary class="tb-trigger" aria-label="All 5 guides">
+    <summary class="tb-trigger" aria-label="All 9 tests &amp; guides">
       <span class="tb-glyph" aria-hidden="true">&#9636;</span>
-      <span class="tb-label">All 5<span class="tb-label-long"> guides</span></span>
+      <span class="tb-label">All 9<span class="tb-label-long"> tests &amp; guides</span></span>
     </summary>
-    <div class="tb-sheet is-flat">
-      <ul>
+    <div class="tb-sheet">
+      <p class="tb-grouplabel" id="tb-g1">Tests</p>
+      <ul aria-labelledby="tb-g1">
+        <li><a href="/" aria-current="page">Visual Reaction Time Test</a></li>
+        <li><a href="/audio-reaction-time-test/">Audio Reaction Time Test</a></li>
+        <li><a href="/choice-reaction-time-test/">Go / No-Go Reaction Test</a></li>
+        <li><a href="/f1-reaction-test/">F1 Lights-Out Reaction Test</a></li>
+      </ul>
+      <p class="tb-grouplabel" id="tb-g2">Your score</p>
+      <ul aria-labelledby="tb-g2">
         <li><a href="/reaction-time-percentiles/">Reaction Time Percentiles</a></li>
         <li><a href="/articles/reaction-time-in-gaming.html">Reaction Time in Gaming</a></li>
         <li><a href="/articles/what-affects-reaction-time.html">What Affects Your Reaction Time</a></li>
+      </ul>
+      <p class="tb-grouplabel" id="tb-g3">How it is measured</p>
+      <ul aria-labelledby="tb-g3">
         <li><a href="/articles/how-this-test-works.html">How This Test Works</a></li>
         <li><a href="/articles/history-of-reaction-time.html">History of Reaction Time</a></li>
       </ul>
-      <p class="tb-hub"><a href="/" aria-current="page">Take the reaction time test →</a></p>
     </div>
   </details>
   <div class="tb-scrim"></div>
   <ul class="tb-rail">
+    <li><a href="/" aria-current="page">Visual</a></li>
+    <li><a href="/audio-reaction-time-test/">Audio</a></li>
+    <li><a href="/choice-reaction-time-test/">Go / No-Go</a></li>
+    <li><a href="/f1-reaction-test/">F1 Lights</a></li>
     <li><a href="/reaction-time-percentiles/">Percentiles</a></li>
     <li><a href="/articles/reaction-time-in-gaming.html">Gaming</a></li>
     <li><a href="/articles/what-affects-reaction-time.html">What Affects It</a></li>
     <li><a href="/articles/how-this-test-works.html">How It Works</a></li>
-    <li><a href="/articles/history-of-reaction-time.html">History</a></li>
   </ul>
 </nav>
 <!-- nav:end -->
@@ -208,6 +221,8 @@
     <h2 style="margin-top:0;">About this reaction time test</h2>
     <p>ReflexZap is a free browser-based reaction time test. It measures the time between the moment a visual cue appears (the box turning green) and the moment you respond by clicking or tapping. This is called <strong>simple visual reaction time</strong> — one of the most common ways to measure how quickly your nervous system processes a stimulus and triggers a motor response.</p>
     <p>Everything runs client-side using your browser's high-precision timer — nothing is uploaded to a server, and your results are stored only on your own device via your browser's local storage.</p>
+    <p><strong>It works with the spacebar too.</strong> Tab to the test area and the <kbd>Space</kbd> and <kbd>Enter</kbd> keys fire the same single handler a click does, so a keyboard reaction time test is this page with your hands somewhere else — there is no separate spacebar version to go and find.</p>
+    <p>Three sibling tests measure stimuli this one does not: the <a href="/audio-reaction-time-test/">audio reaction time test</a> replaces the green box with a tone, the <a href="/choice-reaction-time-test/">go/no-go choice reaction test</a> adds a red cue you have to <em>not</em> respond to and reports your false starts alongside your speed, and the <a href="/f1-reaction-test/">F1 reaction test</a> runs the five-light Formula 1 start procedure and measures you from lights out. Each has its own cited distribution, because each measures something different.</p>
 
     <h2>Frequently asked questions</h2>
 
@@ -238,7 +253,21 @@
   </section>
 
   <section class="container-narrow" id="articles" style="padding-top:0;">
-    <h2 style="margin-top:0;">Learn more about reaction time</h2>
+    <h2 style="margin-top:0;">The other three tests</h2>
+    <div class="faq-item">
+      <h3><a href="/audio-reaction-time-test/">Audio Reaction Time Test</a></h3>
+      <p>The screen never changes — a tone fires instead. Hearing reaches the motor cortex on a shorter path than sight, and the numbers show it.</p>
+    </div>
+    <div class="faq-item">
+      <h3><a href="/choice-reaction-time-test/">Go / No-Go Reaction Test</a></h3>
+      <p>Green means click, red means hold. Reports mean go-latency <em>and</em> a false-start count — two numbers, not one.</p>
+    </div>
+    <div class="faq-item">
+      <h3><a href="/f1-reaction-test/">F1 Reaction Test</a></h3>
+      <p>Five red lights, an unannounced hold, then lights out. The start-line procedure, measured the way a race start is measured.</p>
+    </div>
+
+    <h2>Learn more about reaction time</h2>
     <div class="faq-item">
       <h3><a href="/reaction-time-percentiles/">Reaction Time Percentiles: The Full Distribution, by Age</a></h3>
       <p>The percentile table behind your result, where each figure comes from, and how much of your score is your screen rather than you.</p>
@@ -273,14 +302,14 @@
   </div>
 </footer>
 
-<script src="/assets/js/nav.js?v=5"></script>
+<script src="/assets/js/nav.js?v=6"></script>
 <a href="https://erabb.it" class="erabbit-mark" aria-label="erabb.it"><img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐇</text></svg>" width="10" height="10" alt=""></a>
 
 <div class="announce" id="announce" aria-hidden="true"></div>
 <div class="toast" id="toast">Copied!</div>
 <div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
 
-<script src="/assets/js/percentile.js?v=5"></script>
-<script src="/assets/js/app.js?v=5"></script>
+<script src="/assets/js/percentile.js?v=6"></script>
+<script src="/assets/js/app.js?v=6"></script>
 </body>
 </html>

@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audio Reaction Time Test - How Fast Do You React to Sound?</title>
+<meta name="description" content="Free audio reaction time test. The screen never changes - click the instant you hear the tone. 5 rounds in milliseconds, scored against a cited distribution, entirely in your browser.">
+<link rel="canonical" href="https://reflexzap.com/audio-reaction-time-test/">
+<meta name="theme-color" content="#05070b">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Audio Reaction Time Test - React to Sound, Not Sight">
+<meta property="og:description" content="No visual cue at all. A tone fires after a random delay and the clock runs to your click. 5 rounds, milliseconds, free and instant.">
+<meta property="og:url" content="https://reflexzap.com/audio-reaction-time-test/">
+<meta property="og:image" content="https://reflexzap.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Audio Reaction Time Test - React to Sound, Not Sight">
+<meta name="twitter:description" content="No visual cue at all. A tone fires after a random delay and the clock runs to your click. 5 rounds, milliseconds, free and instant.">
+<meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
+
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/styles.css?v=6">
+<script>try{var t=localStorage.getItem("reflexzap_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Audio Reaction Time Test",
+  "url": "https://reflexzap.com/audio-reaction-time-test/",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free browser-based audio reaction time test: the screen stays dark and a synthesized tone fires after a random delay, measured in milliseconds over 5 rounds."
+}
+</script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7560786263587509" crossorigin="anonymous"></script>
+</head>
+<body data-mode="audio">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="reflexzap.com home">
+      <span class="brand-mark"><span class="bolt" aria-hidden="true"></span>ReflexZap</span>
+      <span class="brand-tag">reaction time test</span>
+    </a>
+    <div class="header-actions">
+      <button id="sound-toggle" class="icon-btn" type="button" aria-label="Toggle sound effects" title="Toggle sound">&#128266;</button>
+      <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle dark/light theme" title="Toggle theme">&#9680;</button>
+    </div>
+  </div>
+</header>
+
+<!-- nav:start -->
+<nav class="toolbar" aria-label="Tools">
+  <details class="tb-menu">
+    <summary class="tb-trigger" aria-label="All 9 tests &amp; guides">
+      <span class="tb-glyph" aria-hidden="true">&#9636;</span>
+      <span class="tb-label">All 9<span class="tb-label-long"> tests &amp; guides</span></span>
+    </summary>
+    <div class="tb-sheet">
+      <p class="tb-grouplabel" id="tb-g1">Tests</p>
+      <ul aria-labelledby="tb-g1">
+        <li><a href="/">Visual Reaction Time Test</a></li>
+        <li><a href="/audio-reaction-time-test/" aria-current="page">Audio Reaction Time Test</a></li>
+        <li><a href="/choice-reaction-time-test/">Go / No-Go Reaction Test</a></li>
+        <li><a href="/f1-reaction-test/">F1 Lights-Out Reaction Test</a></li>
+      </ul>
+      <p class="tb-grouplabel" id="tb-g2">Your score</p>
+      <ul aria-labelledby="tb-g2">
+        <li><a href="/reaction-time-percentiles/">Reaction Time Percentiles</a></li>
+        <li><a href="/articles/reaction-time-in-gaming.html">Reaction Time in Gaming</a></li>
+        <li><a href="/articles/what-affects-reaction-time.html">What Affects Your Reaction Time</a></li>
+      </ul>
+      <p class="tb-grouplabel" id="tb-g3">How it is measured</p>
+      <ul aria-labelledby="tb-g3">
+        <li><a href="/articles/how-this-test-works.html">How This Test Works</a></li>
+        <li><a href="/articles/history-of-reaction-time.html">History of Reaction Time</a></li>
+      </ul>
+    </div>
+  </details>
+  <div class="tb-scrim"></div>
+  <ul class="tb-rail">
+    <li><a href="/">Visual</a></li>
+    <li><a href="/audio-reaction-time-test/" aria-current="page">Audio</a></li>
+    <li><a href="/choice-reaction-time-test/">Go / No-Go</a></li>
+    <li><a href="/f1-reaction-test/">F1 Lights</a></li>
+    <li><a href="/reaction-time-percentiles/">Percentiles</a></li>
+    <li><a href="/articles/reaction-time-in-gaming.html">Gaming</a></li>
+    <li><a href="/articles/what-affects-reaction-time.html">What Affects It</a></li>
+    <li><a href="/articles/how-this-test-works.html">How It Works</a></li>
+  </ul>
+</nav>
+<!-- nav:end -->
+
+<main id="main">
+  <div class="cabinet">
+    <div class="marquee">
+      <div class="marquee-logo"><span class="mq-1">Reflex</span><span class="mq-2">Sound</span></div>
+      <div class="marquee-sub">Ears Only &middot; reflexzap.com</div>
+    </div>
+
+    <div class="crt">
+      <div class="crt-screen">
+        <div class="duel-hud">
+          <div class="duelist duelist--you">
+            <span class="duelist-name">You</span>
+            <span class="pips" id="pips-you"></span>
+          </div>
+          <div class="duel-center">
+            <span class="dc-round" id="round-label">Round 1 of 5</span>
+            <span class="dc-best">Best <b id="best-chip-value">&mdash;</b></span>
+          </div>
+          <div class="duelist duelist--rival">
+            <span class="pips" id="pips-rival"></span>
+            <span class="duelist-name">Rival</span>
+          </div>
+        </div>
+
+        <div class="credit-line"><span class="blink" id="score-credit">Free Play</span></div>
+        <div class="challenge-banner" id="challenge-banner" hidden>
+          <span class="cb-kicker">Challenge</span>
+          <span class="cb-text" id="challenge-text"></span>
+        </div>
+
+        <div class="test-stage state-idle" id="test-stage" role="button" tabindex="0" aria-live="polite" aria-label="Reaction time test area">
+          <div class="stage-round-pill" id="stage-round-pill" aria-hidden="true">Round 1 of 5</div>
+          <button type="button" id="stage-cancel-btn" class="stage-cancel" aria-label="Cancel test">&#10005;</button>
+          <div id="stage-content">
+            <p class="stage-title">Ears only</p>
+            <p class="stage-sub">Turn the volume up, hit Draw, then click the instant you hear the tone.</p>
+          </div>
+        </div>
+      </div>
+      <div class="crt-glare" aria-hidden="true"></div>
+    </div>
+
+    <div class="deck deck--solo">
+      <div class="deck-center" id="stage-controls">
+        <button type="button" id="start-btn" class="start-btn"><span class="start-ring"></span><span class="start-text">Draw!</span></button>
+        <div class="coin-door" aria-hidden="true"><span class="coin-slot"></span>Insert Coin &middot; Free Play</div>
+      </div>
+    </div>
+    <nav class="test-switch" aria-labelledby="test-switch-label">
+      <span class="test-switch-label" id="test-switch-label">The four tests</span>
+      <ul>
+        <li><a href="/">Visual</a></li>
+        <li><a href="/audio-reaction-time-test/" aria-current="page">Audio</a></li>
+        <li><a href="/choice-reaction-time-test/">Go / No-Go</a></li>
+        <li><a href="/f1-reaction-test/">F1 Lights</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <section class="panel panel-narrow" id="results-panel" hidden>
+    <h2>Your results</h2>
+    <div class="rating-banner">
+      <div class="grade-stamp" id="result-grade" aria-hidden="true"></div>
+      <div class="rating-label" id="rating-label"></div>
+      <div class="rating-note" id="rating-note"></div>
+      <div class="rating-percentile" id="rating-percentile"></div>
+    </div>
+    <div class="challenge-verdict" id="challenge-verdict" hidden></div>
+
+    <div class="dist-card" id="dist-card" hidden>
+      <div class="chart-card-title">Where that lands in the published distribution</div>
+      <div id="dist-chart"></div>
+      <p class="dist-source">Modelled from simple auditory reaction times reported in published studies &mdash; <strong>not</strong> from results recorded on this site, which stores nothing off your device. <a href="/reaction-time-percentiles/">See the full table and sources</a>.</p>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-title">Your 5 rounds</div>
+      <div id="rounds-chart"></div>
+    </div>
+
+    <div class="results-grid">
+      <div class="stat-tile highlight">
+        <div class="stat-label">Average</div>
+        <div class="stat-value" id="result-avg">&mdash;</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-label">Best round</div>
+        <div class="stat-value" id="result-best">&mdash;</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-label">All-time best</div>
+        <div class="stat-value" id="result-alltime-best">&mdash;</div>
+      </div>
+    </div>
+
+    <table class="rounds-table visually-hidden">
+      <caption class="visually-hidden">Exact time for each round</caption>
+      <thead><tr><th>Round</th><th class="num">Time</th></tr></thead>
+      <tbody id="rounds-tbody"></tbody>
+    </table>
+
+    <div class="btn-row">
+      <button type="button" id="retry-btn" class="primary">Test again</button>
+      <button type="button" id="copy-btn" class="icon-btn">Copy challenge link</button>
+    </div>
+    <p class="disclaimer">This is a fun, approximate browser-based test &mdash; not a scientific or medical instrument. Your measured time includes your device's screen refresh rate, input latency, and browser/OS rendering delay. The percentile above compares you against a model built from published research, all cited below &mdash; it is not a ranking against other people who have used this site, because no results are ever collected here.</p>
+  </section>
+
+  <section class="panel panel-narrow" id="history-panel">
+    <h2>Your history</h2>
+    <div id="history-empty" class="disclaimer" style="margin-top:0;">No sessions yet &mdash; run the test above to start tracking your history.</div>
+    <div id="history-sparkline" class="sparkline-wrap" hidden></div>
+    <table class="rounds-table" id="history-table" hidden>
+      <thead><tr><th>Date</th><th class="num">Average</th></tr></thead>
+      <tbody id="history-tbody"></tbody>
+    </table>
+  </section>
+
+  <section class="container-narrow" style="padding-top:0;">
+  <h1>Audio Reaction Time Test</h1>
+
+  <p>This is a reaction time test with nothing to look at. The stage stays dark for
+  a random two to five seconds, a short tone fires, and the clock runs from the
+  moment that tone is actually audible to the moment you click, tap or hit
+  <kbd>Space</kbd>. Five rounds, then an average. It is the same measurement the
+  <a href="/">visual reaction time test</a> makes, with the eye taken out of the
+  loop &mdash; which turns out to be worth about twenty milliseconds.</p>
+
+  <div class="callout">
+    <strong>Your browser is in the measurement.</strong> Every number on this page
+    is a browser reading, and a browser reads slower than a laboratory. Anwyl-Irvine
+    and colleagues drove research-grade browser platforms with a calibrated robot
+    finger and measured a mean response lag of <strong>78.81ms</strong> (SD 18.51) in
+    Chrome, and 71.3&ndash;87.4ms across platforms. That delay is your screen, your
+    input device and your operating system, and none of it is you. Where this page
+    quotes a figure measured on laboratory equipment it says so and states the
+    correction applied &mdash; a lab number and a browser number are never presented
+    as the same kind of thing.
+  </div>
+
+  <h2 id="why-faster">Why hearing beats sight</h2>
+  <p>Sound gets to the motor system on a shorter path. A visual stimulus has to be
+  transduced by photoreceptors &mdash; a comparatively slow chemical cascade &mdash;
+  before anything travels down the optic nerve. A sound is transduced mechanically
+  by hair cells, and the auditory pathway to the cortex has fewer synapses to cross.
+  The consequence is measurable, consistent, and smaller than the internet usually
+  claims.</p>
+
+  <p>The cleanest way to see it is a study that measured both stimuli in the
+  <em>same</em> people on the <em>same</em> apparatus. Jain and colleagues did exactly
+  that with 120 subjects: mean visual reaction time <strong>247.60ms</strong> (SD
+  18.54) against mean auditory reaction time <strong>228.01ms</strong> (SD 16.49).
+  The gap is <strong>19.6ms</strong>.</p>
+
+  <p>Two caveats belong with those numbers, and they are why this page does not
+  quote a bigger figure. First, each subject's score in that study is the
+  <em>fastest of five readings</em>, not a mean, so the absolute values sit lower
+  than a mean-based measurement would &mdash; it is the difference between the two
+  conditions that is being borrowed here, not the levels. Second, you will see much
+  larger auditory advantages quoted elsewhere, sometimes forty or fifty milliseconds;
+  those almost always compare figures collected on different equipment in different
+  studies, which measures the equipment as much as the ear. A defensible auditory
+  advantage is around twenty to thirty milliseconds. Anything much larger is an
+  artefact of how the comparison was assembled.</p>
+
+  <h2 id="tone">How the tone is made, and why that matters</h2>
+  <p>The cue is a 1000&nbsp;Hz square wave lasting 130 milliseconds, generated on
+  the fly by the Web Audio API. Nothing is downloaded &mdash; this site makes no
+  external requests of any kind, so there is no audio file to fetch and no chance
+  of a first round being slower than the rest because a sample was still loading.</p>
+
+  <p>The subtle part is deciding <em>when</em> the tone happened. Audio does not
+  play the instant you ask for it: the samples are scheduled, then travel through
+  an output buffer before a speaker moves. Timestamping the moment the note was
+  scheduled would hand you the whole of that buffer as free reaction time, tens of
+  milliseconds of it. So the test schedules the note a fixed lead ahead, then uses
+  <code>AudioContext.getOutputTimestamp()</code> to map that scheduled instant onto
+  the same high-resolution clock the click is read from &mdash; the one API that
+  accounts for the buffer. Where a browser does not provide it, the reported
+  <code>outputLatency</code> is used instead. A click that lands before the tone is
+  genuinely audible is still a false start, and the round restarts.</p>
+
+  <p>Headphones will generally give you a cleaner reading than laptop speakers, and
+  Bluetooth headphones will give you a much worse one &mdash; wireless audio adds its
+  own buffering, often over a hundred milliseconds of it, and no browser API can
+  subtract that for you. If your audio result is dramatically slower than your visual
+  one, suspect the headphones before you suspect your ears.</p>
+
+  <h2 id="distribution">What the percentile compares you to</h2>
+  <p>The percentile on your results is read off a model built from published figures,
+  not from anyone's score on this site &mdash; there is no backend here and nothing
+  leaves your device, so there is nothing to aggregate. The model is anchored by
+  shifting this site's visual distribution by the auditory advantage above: a median
+  of <strong>253ms</strong> (273 &minus; 19.6) with a standard deviation of
+  <strong>34ms</strong> (38 &times; 16.49/18.54, the same study's ratio between its
+  two conditions). Two published numbers, no free parameters, and the whole derivation
+  is in <code>assets/js/percentile.js</code> and on the
+  <a href="/reaction-time-percentiles/">percentile reference page</a>.</p>
+
+  <p>One limitation this model does not correct for: audio output latency varies more
+  between machines than display latency does. The test removes the part of it the
+  browser can report, but a set of wireless earbuds can still put you a whole band
+  lower than the same ears on wired headphones. Compare yourself to yourself, on the
+  same equipment, on different days &mdash; that comparison is real in a way that a
+  rank against a modelled population never quite is.</p>
+
+  <h2>Frequently asked questions</h2>
+  <div class="faq-item">
+    <h3>Is auditory reaction time really faster than visual?</h3>
+    <p>Yes, consistently, by a modest amount. Measured in the same people on the same equipment, the gap is around twenty milliseconds &mdash; 247.60ms visual against 228.01ms auditory in the study cited below. It is a real effect with a real physiological cause, and it is much smaller than the forty-plus millisecond figures that circulate online, which come from comparing separate studies run on different rigs.</p>
+  </div>
+  <div class="faq-item">
+    <h3>I hear nothing when I press Draw.</h3>
+    <p>Browsers refuse to make sound until you have interacted with the page, so the first click on Draw is also what unlocks audio &mdash; that is normal and the test accounts for it. Beyond that: check the mute button in the header (the speaker icon), check your system volume, and check that the tab is not muted. The cue tone deliberately ignores the site's sound-effects mute, because it is the thing being measured rather than a sound effect.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Should I use headphones?</h3>
+    <p>Wired headphones, yes &mdash; they give the cleanest reading. Bluetooth headphones, no: wireless audio adds buffering that can exceed a hundred milliseconds and no browser API can measure it away, so your score will be your headphones' latency plus your reaction time with no way to separate them.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Why does the screen stay dark?</h3>
+    <p>Because any visual change at the moment of the cue would be a second, faster stimulus, and you would end up reacting to the screen instead of the sound. The stage is deliberately inert from the start of the wait until after you respond.</p>
+  </div>
+
+  <h2 id="sources">Sources</h2>
+  <ul class="source-list">
+    <li>Jain A, Bansal R, Kumar A, Singh KD (2015). A comparative study of visual and
+    auditory reaction times on the basis of gender and physical activity levels of
+    medical first year students. International Journal of Applied and Basic Medical
+    Research 5(2):124-127.<span class="src-kind">peer-reviewed</span><br>
+    <a href="https://doi.org/10.4103/2229-516X.157168" rel="nofollow noopener" target="_blank">https://doi.org/10.4103/2229-516X.157168</a><br>
+    Visual and auditory simple reaction time in the same 120 subjects on the same
+    apparatus: visual 247.60 ms (SD 18.54), auditory 228.01 ms (SD 16.49). Each score
+    is the fastest of five readings.</li>
+    <li>Human Benchmark &mdash; Reaction Time Statistics (accessed 2026).<span class="src-kind">web dataset</span><br><a href="https://humanbenchmark.com/tests/reactiontime/statistics" rel="nofollow noopener" target="_blank">https://humanbenchmark.com/tests/reactiontime/statistics</a><br>Over 81 million browser-measured reaction time clicks: median 273 ms, mean 284 ms. Aggregated by that site, not by this one.</li>
+    <li>Anwyl-Irvine A, Dalmaijer ES, Hodges N, Evershed JK (2021). Realistic precision and accuracy of online experiment platforms, web browsers, and devices. Behavior Research Methods 53(4):1407-1425.<span class="src-kind">peer-reviewed</span><br><a href="https://doi.org/10.3758/s13428-020-01501-5" rel="nofollow noopener" target="_blank">https://doi.org/10.3758/s13428-020-01501-5</a><br>Mean browser response lag measured with a calibrated robot actuator: Chrome 78.81 ms (SD 18.51); 71.3-87.4 ms across the four platforms tested.</li>
+  </ul>
+  <p class="disclaimer">Figures are quoted as published. Where this page derives
+  something from them &mdash; the 253ms median and the 34ms spread &mdash; the
+  arithmetic is shown above rather than presented as a measurement.</p>
+
+  <h2>Related</h2>
+  <div class="faq-item">
+    <h3><a href="/">Visual Reaction Time Test</a></h3>
+    <p>The same measurement with the eye back in the loop. Compare the two &mdash; the gap should be around twenty milliseconds.</p>
+  </div>
+  <div class="faq-item">
+    <h3><a href="/choice-reaction-time-test/">Go / No-Go Reaction Test</a></h3>
+    <p>Green means click, red means hold. Adds a decision to the reaction, and reports your false starts as a second number.</p>
+  </div>
+  <div class="faq-item">
+    <h3><a href="/reaction-time-percentiles/">Reaction Time Percentiles</a></h3>
+    <p>The full distribution, the age bands, and where every figure on this site comes from.</p>
+  </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>&copy; <span id="year"></span> reflexzap.com</div>
+    <div class="footer-links">
+      <a href="/reaction-time-percentiles/">Percentiles</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/nav.js?v=6"></script>
+<a href="https://erabb.it" class="erabbit-mark" aria-label="erabb.it"><img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128007;</text></svg>" width="10" height="10" alt=""></a>
+
+<div class="announce" id="announce" aria-hidden="true"></div>
+<div class="toast" id="toast">Copied!</div>
+<div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
+
+<script src="/assets/js/percentile.js?v=6"></script>
+<script src="/assets/js/app.js?v=6"></script>
+</body>
+</html>
