@@ -936,7 +936,7 @@ TEMPLATE = """<!doctype html>
       <thead><tr><th>#</th><th>Name</th><th class="num">Average</th></tr></thead>
       <tbody id="board-tbody"></tbody>
     </table>
-    <form id="board-form" class="btn-row" hidden>
+    <form id="board-form" class="btn-row" style="display:none">
       <input id="board-name" maxlength="20" placeholder="Your name (optional)" autocomplete="nickname" aria-label="Name to post with">
       <button type="submit" class="primary" id="board-post">Post my average</button>
     </form>
@@ -968,7 +968,7 @@ TEMPLATE = """<!doctype html>
 
 <script src="/assets/js/percentile.js?v=%(v)s"></script>
 <script src="/assets/js/app.js?v=%(v)s"></script>
-<script type="module" src="/assets/js/leaderboard.js?v=1"></script>
+<script type="module" src="/assets/js/leaderboard.js?v=2"></script>
 </body>
 </html>
 """
