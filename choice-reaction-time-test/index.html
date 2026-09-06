@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Go / No-Go Reaction Test - Choice Reaction Time and False Starts</title>
-<meta name="description" content="Free go/no-go reaction test. Green means click, red means hold. Eight trials give you a mean go-latency and a false-start count - two numbers, measured in your browser, nothing uploaded.">
+<meta name="description" content="Free go/no-go reaction test. Green means click, red means hold. Eight trials give you a mean go-latency and a false-start count - two numbers, measured in your browser and posted only if you choose.">
 <link rel="canonical" href="https://reflexzap.com/choice-reaction-time-test/">
 <meta name="theme-color" content="#05070b">
 
@@ -21,7 +21,7 @@
 <meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
 
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/styles.css?v=6">
+<link rel="stylesheet" href="/assets/css/styles.css?v=7">
 <script>try{var t=localStorage.getItem("reflexzap_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 
 <script type="application/ld+json">
@@ -220,6 +220,20 @@
     </table>
   </section>
 
+  <section class="panel panel-narrow" id="board-panel" hidden>
+    <h2>Leaderboard</h2>
+    <p class="disclaimer" id="board-note" style="margin-top:0;">The fastest averages visitors chose to post on this test. Nothing is posted unless you post it.</p>
+    <table class="rounds-table" id="board-table" hidden>
+      <thead><tr><th>#</th><th>Name</th><th class="num">Average</th></tr></thead>
+      <tbody id="board-tbody"></tbody>
+    </table>
+    <form id="board-form" class="btn-row" hidden>
+      <input id="board-name" maxlength="20" placeholder="Your name (optional)" autocomplete="nickname" aria-label="Name to post with">
+      <button type="submit" class="primary" id="board-post">Post my average</button>
+    </form>
+    <p class="disclaimer" id="board-status" hidden></p>
+  </section>
+
   <section class="container-narrow" style="padding-top:0;">
   <h1>Go / No-Go Reaction Test</h1>
 
@@ -364,14 +378,15 @@
   </div>
 </footer>
 
-<script src="/assets/js/nav.js?v=6"></script>
+<script src="/assets/js/nav.js?v=7"></script>
 <a href="https://erabb.it" class="erabbit-mark" aria-label="erabb.it"><img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128007;</text></svg>" width="10" height="10" alt=""></a>
 
 <div class="announce" id="announce" aria-hidden="true"></div>
 <div class="toast" id="toast">Copied!</div>
 <div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
 
-<script src="/assets/js/percentile.js?v=6"></script>
-<script src="/assets/js/app.js?v=6"></script>
+<script src="/assets/js/percentile.js?v=7"></script>
+<script src="/assets/js/app.js?v=7"></script>
+<script type="module" src="/assets/js/leaderboard.js?v=1"></script>
 </body>
 </html>

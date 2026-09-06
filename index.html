@@ -215,6 +215,20 @@
     </table>
   </section>
 
+  <section class="panel panel-narrow" id="board-panel" hidden>
+    <h2>Leaderboard</h2>
+    <p class="disclaimer" id="board-note" style="margin-top:0;">The fastest averages visitors chose to post on this test. Nothing is posted unless you post it.</p>
+    <table class="rounds-table" id="board-table" hidden>
+      <thead><tr><th>#</th><th>Name</th><th class="num">Average</th></tr></thead>
+      <tbody id="board-tbody"></tbody>
+    </table>
+    <form id="board-form" class="btn-row" hidden>
+      <input id="board-name" maxlength="20" placeholder="Your name (optional)" autocomplete="nickname" aria-label="Name to post with">
+      <button type="submit" class="primary" id="board-post">Post my average</button>
+    </form>
+    <p class="disclaimer" id="board-status" hidden></p>
+  </section>
+
   <section class="panel panel-narrow" id="achievements-panel">
     <h2>Achievements</h2>
     <div class="achievements-grid" id="achievements-grid"></div>
@@ -223,7 +237,7 @@
   <section class="container-narrow" style="padding-top:0;">
     <h2 style="margin-top:0;">About this reaction time test</h2>
     <p>ReflexZap is a free browser-based reaction time test. It measures the time between the moment a visual cue appears (the box turning green) and the moment you respond by clicking or tapping. This is called <strong>simple visual reaction time</strong> — one of the most common ways to measure how quickly your nervous system processes a stimulus and triggers a motor response.</p>
-    <p>Everything runs client-side using your browser's high-precision timer — nothing is uploaded to a server, and your results are stored only on your own device via your browser's local storage.</p>
+    <p>Everything runs client-side using your browser's high-precision timer — your results are stored only on your own device via your browser's local storage, and nothing is uploaded unless you post an average to the leaderboard.</p>
     <p><strong>It works with the spacebar too.</strong> Tab to the test area and the <kbd>Space</kbd> and <kbd>Enter</kbd> keys fire the same single handler a click does, so a keyboard reaction time test is this page with your hands somewhere else — there is no separate spacebar version to go and find.</p>
     <p>Three sibling tests measure stimuli this one does not: the <a href="/audio-reaction-time-test/">audio reaction time test</a> replaces the green box with a tone, the <a href="/choice-reaction-time-test/">go/no-go choice reaction test</a> adds a red cue you have to <em>not</em> respond to and reports your false starts alongside your speed, and the <a href="/f1-reaction-test/">F1 reaction test</a> runs the five-light Formula 1 start procedure and measures you from lights out. Each has its own cited distribution, because each measures something different.</p>
 
@@ -313,6 +327,7 @@
 <div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
 
 <script src="/assets/js/percentile.js?v=6"></script>
-<script src="/assets/js/app.js?v=6"></script>
+<script src="/assets/js/app.js?v=7"></script>
+<script type="module" src="/assets/js/leaderboard.js?v=1"></script>
 </body>
 </html>

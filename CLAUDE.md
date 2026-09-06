@@ -3,7 +3,8 @@
 Free reaction-time test (click the box the instant it turns green, 5 rounds,
 milliseconds) built as a **retro arcade cabinet**. Static, zero-dependency site:
 vanilla HTML/CSS/JS, no build step, GitHub Pages (`CNAME` → reflexzap.com,
-Cloudflare DNS). Everything runs client-side; nothing is uploaded.
+Cloudflare DNS). Everything runs client-side; nothing is uploaded unless a visitor posts an average to the
+leaderboard, which lives on sch3ma (see `assets/js/leaderboard.js`).
 
 ## The four tests — one engine, `data-mode` on `<body>`
 
