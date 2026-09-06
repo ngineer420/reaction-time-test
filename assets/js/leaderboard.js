@@ -6,8 +6,8 @@
    test, the average in milliseconds and an optional name, and the rank comes back from a
    count. Nothing is posted without the press. */
 
-const PROJECT = "";   // prj_…, from the sch3ma dashboard
-const KEY = "";       // pk_live_…, the project's publishable key
+const PROJECT = "prj_01M1TEZC4XYQDE7ZN2QVYXJ1E8";
+const KEY = "pk_live_01M1TF1VBYBSG5K618S8A6YFE5_N9dKa6xuDcuHGq82JsUqWF8gRXzLAtwz"; // publishable: it ships in the page by design
 const NAME_KEY = "reflexzap_board_name";
 const TOP = 10;
 
