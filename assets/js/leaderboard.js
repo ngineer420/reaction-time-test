@@ -65,8 +65,8 @@ async function boot() {
   let pending = null;
   window.addEventListener("rz:session-done", (e) => {
     pending = e.detail;
-    const form = $("board-form");
-    form.hidden = false;
+    // .btn-row sets display, which outranks the hidden attribute, so the form toggles display itself.
+    $("board-form").style.display = "flex";
     $("board-post").disabled = false;
     $("board-post").textContent = "Post my " + ms(pending.ms) + " average";
     $("board-name").value = store.get(NAME_KEY) || "";
