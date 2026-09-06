@@ -1000,6 +1000,8 @@ if (typeof module !== "undefined" && module.exports) {
 
       const avg = computeAverage(roundTimes);
       const best = computeBest(roundTimes);
+      // The leaderboard hears the average, and posts it only if the visitor asks.
+      window.dispatchEvent(new CustomEvent("rz:session-done", { detail: { test: MODE.key, ms: Math.round(avg) } }));
 
       const prevBest = loadBest();
       const isNewBest = prevBest === null || best < prevBest;

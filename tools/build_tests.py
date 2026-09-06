@@ -44,7 +44,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # Bump together with the ?v= in every other page whenever the coupled
 # HTML/CSS/JS change ships. Cached visitors get new HTML with stale CSS
 # otherwise; this exact bug has hit a sibling site.
-V = "6"
+V = "7"
 
 AD_TAG = (
     '<script async src="https://pagead2.googlesyndication.com/pagead/js/'
@@ -205,8 +205,8 @@ AUDIO_BODY = """  <h1>Audio Reaction Time Test</h1>
 
   <h2 id="distribution">What the percentile compares you to</h2>
   <p>The percentile on your results is read off a model built from published figures,
-  not from anyone's score on this site &mdash; there is no backend here and nothing
-  leaves your device, so there is nothing to aggregate. The model is anchored by
+  not from anyone's score on this site &mdash; nothing leaves your device unless you
+  post an average to the leaderboard, and the model is not built from those posts. The model is anchored by
   shifting this site's visual distribution by the auditory advantage above: a median
   of <strong>253ms</strong> (273 &minus; 19.6) with a standard deviation of
   <strong>34ms</strong> (38 &times; 16.49/18.54, the same study's ratio between its
@@ -606,7 +606,7 @@ TESTS = [
         "description": (
             "Free go/no-go reaction test. Green means click, red means hold. Eight trials "
             "give you a mean go-latency and a false-start count - two numbers, measured in "
-            "your browser, nothing uploaded."
+            "your browser and posted only if you choose."
         ),
         "og_title": "Go / No-Go Reaction Test - Speed and Self-Control",
         "og_description": (
@@ -929,6 +929,20 @@ TEMPLATE = """<!doctype html>
     </table>
   </section>
 
+  <section class="panel panel-narrow" id="board-panel" hidden>
+    <h2>Leaderboard</h2>
+    <p class="disclaimer" id="board-note" style="margin-top:0;">The fastest averages visitors chose to post on this test. Nothing is posted unless you post it.</p>
+    <table class="rounds-table" id="board-table" hidden>
+      <thead><tr><th>#</th><th>Name</th><th class="num">Average</th></tr></thead>
+      <tbody id="board-tbody"></tbody>
+    </table>
+    <form id="board-form" class="btn-row" hidden>
+      <input id="board-name" maxlength="20" placeholder="Your name (optional)" autocomplete="nickname" aria-label="Name to post with">
+      <button type="submit" class="primary" id="board-post">Post my average</button>
+    </form>
+    <p class="disclaimer" id="board-status" hidden></p>
+  </section>
+
   <section class="container-narrow" style="padding-top:0;">
 %(body)s
   </section>
@@ -954,6 +968,7 @@ TEMPLATE = """<!doctype html>
 
 <script src="/assets/js/percentile.js?v=%(v)s"></script>
 <script src="/assets/js/app.js?v=%(v)s"></script>
+<script type="module" src="/assets/js/leaderboard.js?v=1"></script>
 </body>
 </html>
 """

@@ -21,7 +21,7 @@
 <meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
 
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/styles.css?v=6">
+<link rel="stylesheet" href="/assets/css/styles.css?v=7">
 <script>try{var t=localStorage.getItem("reflexzap_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 
 <script type="application/ld+json">
@@ -216,6 +216,20 @@
     </table>
   </section>
 
+  <section class="panel panel-narrow" id="board-panel" hidden>
+    <h2>Leaderboard</h2>
+    <p class="disclaimer" id="board-note" style="margin-top:0;">The fastest averages visitors chose to post on this test. Nothing is posted unless you post it.</p>
+    <table class="rounds-table" id="board-table" hidden>
+      <thead><tr><th>#</th><th>Name</th><th class="num">Average</th></tr></thead>
+      <tbody id="board-tbody"></tbody>
+    </table>
+    <form id="board-form" class="btn-row" hidden>
+      <input id="board-name" maxlength="20" placeholder="Your name (optional)" autocomplete="nickname" aria-label="Name to post with">
+      <button type="submit" class="primary" id="board-post">Post my average</button>
+    </form>
+    <p class="disclaimer" id="board-status" hidden></p>
+  </section>
+
   <section class="container-narrow" style="padding-top:0;">
   <h1>Audio Reaction Time Test</h1>
 
@@ -288,8 +302,8 @@
 
   <h2 id="distribution">What the percentile compares you to</h2>
   <p>The percentile on your results is read off a model built from published figures,
-  not from anyone's score on this site &mdash; there is no backend here and nothing
-  leaves your device, so there is nothing to aggregate. The model is anchored by
+  not from anyone's score on this site &mdash; nothing leaves your device unless you
+  post an average to the leaderboard, and the model is not built from those posts. The model is anchored by
   shifting this site's visual distribution by the auditory advantage above: a median
   of <strong>253ms</strong> (273 &minus; 19.6) with a standard deviation of
   <strong>34ms</strong> (38 &times; 16.49/18.54, the same study's ratio between its
@@ -366,14 +380,15 @@
   </div>
 </footer>
 
-<script src="/assets/js/nav.js?v=6"></script>
+<script src="/assets/js/nav.js?v=7"></script>
 <a href="https://erabb.it" class="erabbit-mark" aria-label="erabb.it"><img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128007;</text></svg>" width="10" height="10" alt=""></a>
 
 <div class="announce" id="announce" aria-hidden="true"></div>
 <div class="toast" id="toast">Copied!</div>
 <div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
 
-<script src="/assets/js/percentile.js?v=6"></script>
-<script src="/assets/js/app.js?v=6"></script>
+<script src="/assets/js/percentile.js?v=7"></script>
+<script src="/assets/js/app.js?v=7"></script>
+<script type="module" src="/assets/js/leaderboard.js?v=1"></script>
 </body>
 </html>
