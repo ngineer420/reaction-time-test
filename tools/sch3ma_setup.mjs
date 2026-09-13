@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* One-time project setup on sch3ma, run with the project's secret key. Safe to re-run:
-   a definition that already exists is replayed through the two-call confirm.
+   PUT creates a collection and refuses one that exists, so a re-run reports the collection
+   as already there and goes on to the settings below, which every run rewrites.
 
      SCH3MA_PROJECT=prj_… SCH3MA_SECRET=sk_live_… node tools/sch3ma_setup.mjs
 
@@ -38,8 +39,8 @@ async function call(method, path, body) {
 }
 
 // The two-call rule: a first call answers a report and a token, the second commits.
-async function twoCall(method, path, body) {
-  const first = await call(method, path, body);
+async function twoCall(method, path, body, made) {
+  const first = made ?? (await call(method, path, body));
   if (first.status === 201) return first;
   if (first.status !== 200 || !first.json || !first.json.report) throw new Error(`${method} ${path}: ${first.status} ${first.text}`);
   const second = await call(method, `${path}?_confirm=${encodeURIComponent(first.json.report.confirm_token)}`, body);
@@ -47,7 +48,14 @@ async function twoCall(method, path, body) {
   return second;
 }
 
-console.log(`results: ${(await twoCall("PUT", "/_schemas/results", RESULTS)).status}`);
+// A collection PUT creates and never replaces, so a second run answers 409. That is the
+// collection standing where this script wants it, which is what the run asked for.
+const made = await call("PUT", "/_schemas/results", RESULTS);
+if (made.status === 409 && made.json?.error?.code === "collection_exists") {
+  console.log("results: exists");
+} else {
+  console.log(`results: ${(await twoCall("PUT", "/_schemas/results", RESULTS, made)).status}`);
+}
 console.log(`origins: ${(await twoCall("PUT", "/_origins", { origins: ORIGINS })).status}`);
 const identity = await call("PATCH", "/_identity", IDENTITY);
 console.log(`identity: ${identity.status} ${identity.text}`);
