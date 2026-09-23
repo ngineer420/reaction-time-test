@@ -21,7 +21,7 @@
 <meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
 
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/styles.css?v=6">
+<link rel="stylesheet" href="/assets/css/styles.css?v=8">
 <script>try{var t=localStorage.getItem("reflexzap_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 
 <script type="application/ld+json">
@@ -38,6 +38,56 @@
 </script>
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7560786263587509" crossorigin="anonymous"></script>
+<!-- seo:start -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What's a good reaction time?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For simple visual reaction time, most healthy adults land somewhere between about 200 and 300 milliseconds. Under 200ms is unusually fast for a browser-based test (and may include some clicks that were a little anticipatory rather than purely reactive). Times creeping past 350ms are still completely normal — reaction time varies a lot based on tiredness, age, screen refresh rate, and how much coffee you've had. The reaction time percentiles page has the full distribution, age bands, and the studies each figure comes from."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is reaction time measured on this site?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Each round, the box waits a random delay between 2 and 5 seconds before turning green, so you can't predict exactly when it will happen. The moment it turns green is recorded using the browser's high-resolution timer, and the moment you click or tap is recorded the same way. The difference between those two timestamps is your reaction time for that round. We run 5 rounds per session and show your average and your fastest single round."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens if I click too soon?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "If you click before the box turns green, you'll see a brief \"Not yet!\" flash — that means you jumped the gun. The round doesn't count against you; it simply restarts with a fresh random delay. This keeps the test measuring genuine reaction to the stimulus rather than a guessed or timed click."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this test scientifically accurate?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It's a fun, approximate measurement, not a clinical or laboratory instrument. Browser JavaScript timers, screen refresh rates (typically 60Hz, meaning a new frame only appears roughly every 16.7ms), input device polling rates, and general system load all add a bit of extra latency on top of your true biological reaction time. Lab equipment used in vision-science research eliminates most of this noise with dedicated hardware. Treat your results here as a relative, repeatable way to track your own reflexes over time rather than an exact number."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can reaction time be improved?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Somewhat. Reaction time tends to be faster when you're well-rested, alert, and free of distractions, and tends to slow with fatigue, alcohol, certain medications, and age. Practice can modestly improve your performance on a specific test like this one as you get used to the rhythm, but the underlying biological reaction speed changes only gradually, if at all."
+      }
+    }
+  ]
+}
+</script>
+<!-- seo:end -->
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -105,7 +155,7 @@
 <main id="main">
   <div class="cabinet">
     <div class="marquee">
-      <div class="marquee-logo"><span class="mq-1">Reflex</span><span class="mq-2">Duel</span></div>
+      <h1 class="marquee-logo"><span class="visually-hidden">Reaction Time Test &mdash; How Fast Are Your Reflexes?</span><span class="mq-1" aria-hidden="true">Reflex</span><span class="mq-2" aria-hidden="true">Duel</span></h1>
       <div class="marquee-sub">Quickest Draw Wins · reflexzap.com</div>
     </div>
 
@@ -238,7 +288,7 @@
     <h2 style="margin-top:0;">About this reaction time test</h2>
     <p>ReflexZap is a free browser-based reaction time test. It measures the time between the moment a visual cue appears (the box turning green) and the moment you respond by clicking or tapping. This is called <strong>simple visual reaction time</strong> — one of the most common ways to measure how quickly your nervous system processes a stimulus and triggers a motor response.</p>
     <p>Everything runs client-side using your browser's high-precision timer — your results are stored only on your own device via your browser's local storage, and nothing is uploaded unless you post an average to the leaderboard.</p>
-    <p><strong>It works with the spacebar too.</strong> Tab to the test area and the <kbd>Space</kbd> and <kbd>Enter</kbd> keys fire the same single handler a click does, so a keyboard reaction time test is this page with your hands somewhere else — there is no separate spacebar version to go and find.</p>
+    <p><strong>It works with the spacebar too.</strong> Tab to the Draw button and press <kbd>Space</kbd> or <kbd>Enter</kbd>. Focus moves to the test area, where those same <kbd>Space</kbd> and <kbd>Enter</kbd> keys fire the same single handler a click does. A keyboard reaction time test is this page with your hands somewhere else — there is no separate spacebar version to go and find.</p>
     <p>Three sibling tests measure stimuli this one does not: the <a href="/audio-reaction-time-test/">audio reaction time test</a> replaces the green box with a tone, the <a href="/choice-reaction-time-test/">go/no-go choice reaction test</a> adds a red cue you have to <em>not</em> respond to and reports your false starts alongside your speed, and the <a href="/f1-reaction-test/">F1 reaction test</a> runs the five-light Formula 1 start procedure and measures you from lights out. Each has its own cited distribution, because each measures something different.</p>
 
     <h2>Frequently asked questions</h2>
@@ -317,17 +367,28 @@
       <a href="/terms.html">Terms</a>
     </div>
   </div>
+<!-- peers:start -->
+  <div class="footer-peers">
+    <span class="fp-label">More free browser tools</span>
+    <ul>
+      <li><a href="https://flicktrainer.com" rel="noopener">Flick Trainer <span class="fp-kind">aim training</span></a></li>
+      <li><a href="https://cpsboost.com" rel="noopener">cpsboost <span class="fp-kind">click speed</span></a></li>
+      <li><a href="https://chimpmemory.com" rel="noopener">Chimp Memory <span class="fp-kind">memory tests</span></a></li>
+      <li><a href="https://hardwarecheckup.com" rel="noopener">Hardware Checkup <span class="fp-kind">hardware diagnostics</span></a></li>
+    </ul>
+  </div>
+<!-- peers:end -->
 </footer>
 
-<script src="/assets/js/nav.js?v=6"></script>
+<script src="/assets/js/nav.js?v=8"></script>
 <a href="https://erabb.it" class="erabbit-mark" aria-label="erabb.it"><img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐇</text></svg>" width="10" height="10" alt=""></a>
 
 <div class="announce" id="announce" aria-hidden="true"></div>
 <div class="toast" id="toast">Copied!</div>
 <div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
 
-<script src="/assets/js/percentile.js?v=6"></script>
-<script src="/assets/js/app.js?v=7"></script>
+<script src="/assets/js/percentile.js?v=8"></script>
+<script src="/assets/js/app.js?v=8"></script>
 <script type="module" src="/assets/js/leaderboard.js?v=2"></script>
 </body>
 </html>

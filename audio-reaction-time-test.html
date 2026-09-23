@@ -21,7 +21,7 @@
 <meta name="twitter:image" content="https://reflexzap.com/assets/og-image.png">
 
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/styles.css?v=7">
+<link rel="stylesheet" href="/assets/css/styles.css?v=8">
 <script>try{var t=localStorage.getItem("reflexzap_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 
 <script type="application/ld+json">
@@ -34,6 +34,67 @@
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "description": "Free browser-based audio reaction time test: the screen stays dark and a synthesized tone fires after a random delay, measured in milliseconds over 5 rounds."
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is auditory reaction time really faster than visual?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, consistently, by a modest amount. Measured in the same people on the same equipment, the gap is around twenty milliseconds — 247.60ms visual against 228.01ms auditory in the study cited below. It is a real effect with a real physiological cause, and it is much smaller than the forty-plus millisecond figures that circulate online, which come from comparing separate studies run on different rigs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "I hear nothing when I press Draw.",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Browsers refuse to make sound until you have interacted with the page, so the first click on Draw is also what unlocks audio — that is normal and the test accounts for it. Beyond that: check the mute button in the header (the speaker icon), check your system volume, and check that the tab is not muted. The cue tone deliberately ignores the site's sound-effects mute, because it is the thing being measured rather than a sound effect."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I use headphones?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Wired headphones, yes — they give the cleanest reading. Bluetooth headphones, no: wireless audio adds buffering that can exceed a hundred milliseconds and no browser API can measure it away, so your score will be your headphones' latency plus your reaction time with no way to separate them."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why does the screen stay dark?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Because any visual change at the moment of the cue would be a second, faster stimulus, and you would end up reacting to the screen instead of the sound. The stage is deliberately inert from the start of the wait until after you respond."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://reflexzap.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Audio Reaction Time Test",
+      "item": "https://reflexzap.com/audio-reaction-time-test/"
+    }
+  ]
 }
 </script>
 
@@ -378,17 +439,28 @@
       <a href="/terms.html">Terms</a>
     </div>
   </div>
+<!-- peers:start -->
+  <div class="footer-peers">
+    <span class="fp-label">More free browser tools</span>
+    <ul>
+      <li><a href="https://flicktrainer.com" rel="noopener">Flick Trainer <span class="fp-kind">aim training</span></a></li>
+      <li><a href="https://cpsboost.com" rel="noopener">cpsboost <span class="fp-kind">click speed</span></a></li>
+      <li><a href="https://chimpmemory.com" rel="noopener">Chimp Memory <span class="fp-kind">memory tests</span></a></li>
+      <li><a href="https://hardwarecheckup.com" rel="noopener">Hardware Checkup <span class="fp-kind">hardware diagnostics</span></a></li>
+    </ul>
+  </div>
+<!-- peers:end -->
 </footer>
 
-<script src="/assets/js/nav.js?v=7"></script>
+<script src="/assets/js/nav.js?v=8"></script>
 <a href="https://erabb.it" class="erabbit-mark" aria-label="erabb.it"><img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128007;</text></svg>" width="10" height="10" alt=""></a>
 
 <div class="announce" id="announce" aria-hidden="true"></div>
 <div class="toast" id="toast">Copied!</div>
 <div class="unlock-stack" id="unlock-stack" aria-live="polite"></div>
 
-<script src="/assets/js/percentile.js?v=7"></script>
-<script src="/assets/js/app.js?v=7"></script>
+<script src="/assets/js/percentile.js?v=8"></script>
+<script src="/assets/js/app.js?v=8"></script>
 <script type="module" src="/assets/js/leaderboard.js?v=2"></script>
 </body>
 </html>

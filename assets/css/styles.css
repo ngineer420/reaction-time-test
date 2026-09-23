@@ -1072,6 +1072,36 @@ kbd {
 .footer-links { display: flex; gap: 16px; flex-wrap: wrap; }
 .footer-links a { color: var(--text-dim); }
 
+/* Cross-property row: four sibling tools, not the whole portfolio. It sits
+   under .footer-inner and above the erabb.it mark, which keeps its own place as
+   the last element in <body>. */
+.footer-peers {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 20px 32px;
+  color: var(--text-faint);
+  font-size: 12.5px;
+}
+.footer-peers .fp-label {
+  display: block;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: 10.5px;
+}
+.footer-peers ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.footer-peers a { color: var(--text-dim); text-decoration: none; }
+.footer-peers a:hover { color: var(--accent); text-decoration: underline; }
+.footer-peers .fp-kind { color: var(--text-faint); }
+.footer-peers .fp-kind::before { content: "\2014\00a0"; }
+
 .erabbit-mark { display: block; width: 10px; margin: 0 0 0 auto; line-height: 0; }
 .erabbit-mark img { display: block; width: 10px; height: 10px; }
 
@@ -1279,7 +1309,10 @@ main { max-width: 860px; }
   overflow: visible;
 }
 .marquee::after { display: none; }
-.marquee-logo { display: block; line-height: 1.1; }
+/* .marquee-logo is the page <h1> on index.html and a <div> on the generated
+   test pages, which carry their own <h1> lower down. Reset the heading
+   defaults so the two render identically. */
+.marquee-logo { display: block; line-height: 1.1; margin: 0; font-size: 1rem; font-weight: inherit; }
 .marquee-logo .mq-1, .marquee-logo .mq-2 { -webkit-text-stroke: 0 !important; text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 4px 4px 0 var(--accent-dim) !important; }
 .marquee-logo .mq-1 { font-size: clamp(13px, 3vw, 22px); color: #fff; }
 .marquee-logo .mq-2 { font-size: clamp(18px, 4vw, 30px); color: var(--accent); }

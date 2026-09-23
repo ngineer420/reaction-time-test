@@ -57,7 +57,8 @@ byte-identical twin pair, and `percentile.test.js` asserts each pair is identica
 and canonicalises to the clean path.
 
 ```
-python3 tools/build_tests.py && python3 tools/sync_nav.py
+python3 tools/build_tests.py && python3 tools/sync_nav.py \
+  && python3 tools/build_seo.py && python3 tools/build_sitemap.py
 ```
 
 Order-independent and idempotent: `build_tests.py` carries whatever sync_nav has
@@ -93,7 +94,19 @@ the one page whose markup is not a variation on anything.
   (identical content, canonical on both points at `/reaction-time-percentiles/`).
 - `privacy.html` / `terms.html` — required for ad networks; keep working.
 - `test/percentile.test.js` — `node --test 'test/*.test.js'`. No package.json,
-  no dependencies.
+  no dependencies. It is the whole site's test file, not only the model's: it
+  also guards the portfolio furniture, the honesty rules, the keyboard path and
+  the structured data.
+- `tools/seo.py` — the JSON-LD builders and the four-peer footer, shared by
+  `build_tests.py` and `build_seo.py` so the two generators cannot disagree.
+- `tools/build_seo.py` — owns `<!-- seo:start -->` in `<head>` and
+  `<!-- peers:start -->` in `<footer>` on every HAND-WRITTEN page. It never
+  touches the six files `build_tests.py` writes; those carry the same blocks
+  from the template. FAQ questions and answers are read off the page, never
+  retyped, so `FAQPage` markup cannot drift from the visible copy.
+- `tools/build_sitemap.py` — computes `<lastmod>` from each file's mtime. The
+  URL list, `changefreq` and `priority` stay hand-curated. **Run it last**, after
+  every other generator, or it stamps times the generators are about to change.
 
 No `?v=` cache-bust convention (GitHub Pages `max-age=600`).
 
@@ -150,9 +163,19 @@ Presentation only — **never touches the reaction measurement**:
   minus `greenAt`. The pure helpers (`computeAverage` / `computeBest` /
   `getRatingLabel`) are DOM-free and unit-testable. The HUD, announce, and grade
   are flavour and must never feed back into timing.
-- **Clicks/taps are handled on `pointerdown` only** (one listener covers mouse +
-  touch + pen; we deliberately do NOT also listen for `click`). Don't add a
-  second handler.
+- **The STAGE is handled on `pointerdown` only** (one listener covers mouse +
+  touch + pen, and it fires earlier than `click`). Never add a `click` listener
+  to `#test-stage`: it would score the same response twice, and late.
+- **The CONTROL buttons are the opposite case.** Draw / cancel / test again /
+  copy are bound to `click`, because `pointerdown` never fires for Space or
+  Enter on a `<button>` and a keyboard visitor could not start a test at all
+  while they were bound to it (issue #27). `#stage-cancel-btn` sits INSIDE the
+  stage, so it keeps a `pointerdown` listener whose only job is
+  `e.stopPropagation()` — a shield, not a second activation path.
+- **`startTest()` moves focus to the stage.** It hides the Draw button, which
+  would otherwise drop focus to `<body>` and leave Space scrolling the page.
+  `index.html` states in prose that Space and Enter work; a test asserts the
+  claim and the code stay together.
 - **Ads: AdSense Auto ads only.** One `<script>` in `<head>` (client
   `ca-pub-7560786263587509`). NEVER add `.ad-slot` divs or manual units.
 - **Respect `prefers-reduced-motion`** — every new animation needs a reduce
@@ -226,7 +249,7 @@ reflexzap was rebuilt from the "web-slick" arcade pass into a genuine
   never touches timing.
 - **Cache-bust adopted**: `styles.css?v=` / `app.js?v=` on every page. **Bump
   the `?v=` on any coupled HTML+CSS/JS change** or cached visitors get new HTML
-  with stale CSS (this exact bug hit cpsboost). Currently `?v=6`.
+  with stale CSS (this exact bug hit cpsboost). Currently `?v=8`.
 
 ## The nav toolbar — never hand-edit it
 
