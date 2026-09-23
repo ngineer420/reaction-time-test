@@ -33,6 +33,9 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import seo  # noqa: E402
+
 # The toolbar belongs to sync_nav.py and to no one else. This script emits an
 # empty marker pair and, on every subsequent run, carries whatever sync_nav has
 # put between the markers straight across — so the two scripts can be run in
@@ -44,7 +47,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # Bump together with the ?v= in every other page whenever the coupled
 # HTML/CSS/JS change ships. Cached visitors get new HTML with stale CSS
 # otherwise; this exact bug has hit a sibling site.
-V = "7"
+V = "8"
 
 AD_TAG = (
     '<script async src="https://pagead2.googlesyndication.com/pagead/js/'
@@ -707,6 +710,18 @@ TESTS = [
 def render(t):
     url = "https://reflexzap.com/%s/" % t["slug"]
 
+    # The structured data is derived from the rendered body, never retyped: the
+    # FAQ pairs come back out of the HTML this script just built, so a FAQPage
+    # answer cannot disagree with the answer on screen. seo.extract_faq() is the
+    # same reader tools/build_seo.py runs over the hand-written pages.
+    body_html = t["body"]
+    blocks = []
+    faq_pairs = seo.extract_faq(body_html)
+    if faq_pairs:
+        blocks.append(seo.script(seo.faq_page(faq_pairs)))
+    blocks.append(seo.script(seo.breadcrumb(seo.heading_of(body_html), url)))
+    jsonld_extra = "\n" + "\n".join(blocks)
+
     lights = ""
     if t["lights"]:
         lights = (
@@ -755,6 +770,8 @@ def render(t):
         "body": t["body"],
         "ad": AD_TAG,
         "erabbit": ERABBIT,
+        "peers": seo.peers_html(),
+        "jsonld_extra": jsonld_extra,
         "v": V,
     }
 
@@ -797,6 +814,7 @@ TEMPLATE = """<!doctype html>
   "description": "%(jsonld_desc)s"
 }
 </script>
+%(jsonld_extra)s
 
 %(ad)s
 </head>
@@ -957,6 +975,7 @@ TEMPLATE = """<!doctype html>
       <a href="/terms.html">Terms</a>
     </div>
   </div>
+%(peers)s
 </footer>
 
 <script src="/assets/js/nav.js?v=%(v)s"></script>

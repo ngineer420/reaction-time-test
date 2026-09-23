@@ -11,6 +11,12 @@ const MODEL = P.REACTION_TIME_MS;
 
 const REPO = path.join(__dirname, "..");
 
+/* Hosts this site LINKS to but never LOADS from. A plain <a href> costs the
+   visitor nothing until they click it; a <script>, <link> or <img> is a
+   third-party request on every page view, and those stay banned. The last four
+   are the sibling tools in the footer's related-tools block. */
+const PLAIN_LINKS = /^https?:\/\/(doi\.org|humanbenchmark\.com|erabb\.it|schema\.org|sch3ma\.com|flicktrainer\.com|cpsboost\.com|chimpmemory\.com|hardwarecheckup\.com)/;
+
 /* A second, deliberately different model: higher-is-better, different units.
    The engine must not assume milliseconds or that low scores win. */
 const HIGHER_IS_BETTER = {
@@ -283,7 +289,7 @@ test("the reference page makes no external requests", () => {
     .map((m) => m[1])
     .filter((u) => !u.startsWith("https://reflexzap.com/"))
     .filter((u) => !u.startsWith("https://pagead2.googlesyndication.com/")) // the one allowed ad tag
-    .filter((u) => !/^https?:\/\/(doi\.org|humanbenchmark\.com|erabb\.it|schema\.org)/.test(u)); // plain links, not loads
+    .filter((u) => !PLAIN_LINKS.test(u)); // plain links, not loads
   assert.deepStrictEqual(external, [], "unexpected external resource");
   assert.ok(!/<link[^>]+fonts\./.test(pageHtml), "no web fonts");
 });
@@ -504,7 +510,7 @@ test("the audio-vs-visual page carries the portfolio furniture", () => {
     .map((m) => m[1])
     .filter((u) => !u.startsWith("https://reflexzap.com/"))
     .filter((u) => !u.startsWith("https://pagead2.googlesyndication.com/"))
-    .filter((u) => !/^https?:\/\/(doi\.org|humanbenchmark\.com|erabb\.it|schema\.org)/.test(u));
+    .filter((u) => !PLAIN_LINKS.test(u));
   assert.deepStrictEqual(external, [], "unexpected external resource");
 });
 
@@ -558,7 +564,7 @@ for (const sib of SIBLINGS) {
       .map((m) => m[1])
       .filter((u) => !u.startsWith("https://reflexzap.com/"))
       .filter((u) => !u.startsWith("https://pagead2.googlesyndication.com/"))
-      .filter((u) => !/^https?:\/\/(doi\.org|humanbenchmark\.com|erabb\.it|schema\.org|www\.fia\.com|worldathletics\.org)/.test(u));
+      .filter((u) => !PLAIN_LINKS.test(u) && !/^https?:\/\/(www\.fia\.com|worldathletics\.org)/.test(u));
     assert.deepStrictEqual(external, [], "unexpected external resource");
     assert.ok(!/<link[^>]+fonts\./.test(html), "no web fonts");
   });
@@ -649,3 +655,231 @@ function shippedFiles() {
   })(REPO);
   return out;
 }
+
+/* ==================================================================
+   KEYBOARD REACH (issue #27).
+
+   The stage and the control buttons are two different kinds of thing
+   and they must not share an event. The STAGE is the measurement, so
+   it listens for pointerdown, which fires earlier than click. The
+   CONTROL buttons only start, cancel, repeat and share a test, and
+   pointerdown NEVER fires for Space or Enter on a <button>, so a
+   control bound to it is unreachable from a keyboard.
+   ================================================================== */
+
+const appJs = fs.readFileSync(path.join(REPO, "assets/js/app.js"), "utf8");
+
+test("every control button activates on click, so Space and Enter reach it", () => {
+  for (const btn of ["startBtn", "cancelBtn", "retryBtn", "copyBtn"]) {
+    assert.match(
+      appJs,
+      new RegExp(`${btn}\\.addEventListener\\("click"`),
+      `${btn} must activate on "click" - pointerdown does not fire for Space or Enter`
+    );
+  }
+});
+
+test("no control button runs its action on pointerdown", () => {
+  // The cancel button keeps a pointerdown listener, but that listener only
+  // stops the event reaching the stage underneath it. It must not act.
+  const shield = appJs.match(
+    /cancelBtn\.addEventListener\("pointerdown",\s*\(e\)\s*=>\s*\{([\s\S]*?)\}\);/
+  );
+  assert.ok(shield, "the cancel button must keep its pointerdown shield");
+  assert.match(shield[1], /^\s*e\.stopPropagation\(\);\s*$/, "the shield must only stop the event");
+
+  for (const call of ["startTest", "cancelTest", "copyResult"]) {
+    const doubled = new RegExp(`addEventListener\\("pointerdown"[\\s\\S]{0,120}?${call}\\(\\)`);
+    assert.ok(!doubled.test(appJs), `${call}() must not also run on pointerdown`);
+  }
+});
+
+test("the stage still measures on pointerdown and nothing else", () => {
+  assert.match(appJs, /stageEl\.addEventListener\("pointerdown", handleStageActivate\)/);
+  assert.ok(
+    !/stageEl\.addEventListener\("click"/.test(appJs),
+    "a click listener on the stage would score the response twice, and late"
+  );
+});
+
+test("starting a test hands the keyboard to the stage", () => {
+  // Draw! is hidden the instant a test begins. Without this, focus falls to
+  // <body> and Space scrolls the page instead of answering the cue.
+  const start = appJs.match(/function startTest\(\)\s*\{([\s\S]*?)\n  \}/);
+  assert.ok(start, "startTest() not found");
+  assert.match(start[1], /stageControls\.hidden = true;[\s\S]*?focusStage\(\);/);
+  assert.match(appJs, /function focusStage\(\)/);
+});
+
+test("the home page's keyboard claim is true of the shipped code", () => {
+  const home = fs.readFileSync(path.join(REPO, "index.html"), "utf8");
+  assert.ok(
+    /Tab to the Draw button and press <kbd>Space<\/kbd> or <kbd>Enter<\/kbd>/.test(home),
+    "index.html states that Space and Enter work - keep the claim and the code together"
+  );
+  // The claim needs three things: a focusable stage, a key handler on it, and a
+  // start control a keyboard can press.
+  assert.match(home, /id="test-stage"[^>]*tabindex="0"/);
+  assert.match(appJs, /stageEl\.addEventListener\("keydown"/);
+  assert.match(appJs, /startBtn\.addEventListener\("click"/);
+});
+
+/* ==================================================================
+   STRUCTURED DATA.
+   FAQPage markup that does not match the visible copy is a lie to the
+   crawler, so the questions and answers are checked against the text
+   of the page rather than against the generator that wrote them.
+   ================================================================== */
+
+const ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", mdash: "—",
+                   ndash: "–", hellip: "…", rsquo: "’", times: "×", deg: "°" };
+
+function plainText(html) {
+  return html
+    .replace(/<\/?(?:p|div|br|li|ul|ol|h[1-6]|table|tr|td|th)\b[^>]*>/gi, " ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&([a-z]+);/gi, (m, name) => (name.toLowerCase() in ENTITIES ? ENTITIES[name.toLowerCase()] : m))
+    .replace(/ /g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function sitePages() {
+  const out = [];
+  (function walk(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name === ".git" || entry.name === ".worktrees" || entry.name === "node_modules") continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.name.endsWith(".html")) out.push(full);
+    }
+  })(REPO);
+  return out.sort();
+}
+
+const PAGES = sitePages();
+
+function blocksOf(html) {
+  return [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map((m) => JSON.parse(m[1]));
+}
+
+test("every JSON-LD block on the site parses", () => {
+  let count = 0;
+  for (const file of PAGES) {
+    const html = fs.readFileSync(file, "utf8");
+    for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+      assert.doesNotThrow(() => JSON.parse(m[1]), `${path.relative(REPO, file)} has invalid JSON-LD`);
+      count++;
+    }
+  }
+  assert.ok(count > 20, `expected structured data across the site, found ${count}`);
+});
+
+test("every page with a FAQ carries FAQPage markup that matches the copy", () => {
+  let pagesWithFaq = 0;
+  for (const file of PAGES) {
+    const html = fs.readFileSync(file, "utf8");
+    const rel = path.relative(REPO, file);
+    if (!/<h2[^>]*>\s*Frequently asked questions\s*<\/h2>/.test(html)) continue;
+    pagesWithFaq++;
+    const faq = blocksOf(html).find((b) => b["@type"] === "FAQPage");
+    assert.ok(faq, `${rel} shows an FAQ but ships no FAQPage markup`);
+    const text = plainText(html);
+    for (const q of faq.mainEntity) {
+      assert.ok(text.includes(plainText(q.name)), `${rel}: question is not on the page: ${q.name}`);
+      const answer = plainText(q.acceptedAnswer.text);
+      assert.ok(text.includes(answer), `${rel}: answer is not on the page: ${answer.slice(0, 60)}...`);
+    }
+  }
+  assert.ok(pagesWithFaq >= 7, `expected the FAQ pages to be found, saw ${pagesWithFaq}`);
+});
+
+test("every page below the root carries a BreadcrumbList", () => {
+  for (const file of PAGES) {
+    const rel = path.relative(REPO, file);
+    // index.html is the root of the trail; 404.html is not a destination.
+    if (rel === "index.html" || rel === "404.html") continue;
+    const html = fs.readFileSync(file, "utf8");
+    const crumbs = blocksOf(html).find((b) => b["@type"] === "BreadcrumbList");
+    assert.ok(crumbs, `${rel} has no BreadcrumbList`);
+    assert.strictEqual(crumbs.itemListElement[0].item, "https://reflexzap.com/");
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/);
+    if (canonical) assert.strictEqual(crumbs.itemListElement[1].item, canonical[1]);
+  }
+});
+
+test("every article carries Article markup and the four Open Graph tags", () => {
+  const articles = PAGES.filter((f) => path.relative(REPO, f).startsWith("articles/"));
+  assert.strictEqual(articles.length, 4);
+  for (const file of articles) {
+    const rel = path.relative(REPO, file);
+    const html = fs.readFileSync(file, "utf8");
+    const article = blocksOf(html).find((b) => b["@type"] === "Article");
+    assert.ok(article, `${rel} has no Article markup`);
+    assert.ok(html.includes(`<h1>${article.headline}</h1>`), `${rel}: headline must be the h1`);
+    assert.strictEqual(article.url, html.match(/<link rel="canonical" href="([^"]+)"/)[1]);
+    for (const tag of ["og:type", "og:title", "og:description", "og:url"]) {
+      assert.ok(html.includes(`property="${tag}"`), `${rel} is missing ${tag}`);
+    }
+  }
+});
+
+test("every page with a footer carries the related-tools block, and the mark stays last", () => {
+  const peers = ["flicktrainer.com", "cpsboost.com", "chimpmemory.com", "hardwarecheckup.com"];
+  let seen = 0;
+  for (const file of PAGES) {
+    const html = fs.readFileSync(file, "utf8");
+    const rel = path.relative(REPO, file);
+    if (!html.includes("<footer")) continue;
+    seen++;
+    assert.match(html, /<footer[\s\S]*<div class="footer-peers">[\s\S]*<\/footer>/, `${rel}: block must be inside the footer`);
+    for (const peer of peers) {
+      assert.match(html, new RegExp(`href="https://${peer.replace(".", "\\.")}" rel="noopener"`), `${rel} is missing ${peer}`);
+    }
+    // Four peers, not the whole portfolio - a longer list reads as a link farm.
+    const links = html.match(/<div class="footer-peers">[\s\S]*?<\/div>/)[0].match(/<a /g) || [];
+    assert.strictEqual(links.length, 4, `${rel}: the related-tools block must stay at four links`);
+    assert.match(html, /erabbit-mark[\s\S]*?<\/a>\s*(<div[\s\S]*?)?<\/body>|erabbit-mark/);
+  }
+  assert.ok(seen >= 17, `expected every page to have a footer, saw ${seen}`);
+});
+
+test("privacy.html does not claim analytics the site does not run", () => {
+  const privacy = fs.readFileSync(path.join(REPO, "privacy.html"), "utf8");
+  assert.ok(/This site runs no analytics\./.test(privacy));
+  assert.ok(!/we may use[^.]*analytics/i.test(privacy), "no hedged analytics claim");
+  // Nothing on the site may load an analytics endpoint either.
+  for (const file of PAGES) {
+    const html = fs.readFileSync(file, "utf8");
+    assert.ok(
+      !/(google-analytics\.com|googletagmanager\.com|plausible\.io|\/gtag\/js)/.test(html),
+      `${path.relative(REPO, file)} loads an analytics script`
+    );
+  }
+});
+
+test("the home page has exactly one h1 and it names the test", () => {
+  const home = fs.readFileSync(path.join(REPO, "index.html"), "utf8");
+  const h1s = home.match(/<h1\b/g) || [];
+  assert.strictEqual(h1s.length, 1, "the home page needs exactly one h1");
+  assert.match(home, /<h1 class="marquee-logo">.*?Reaction Time Test/);
+});
+
+test("every page has exactly one h1", () => {
+  for (const file of PAGES) {
+    const html = fs.readFileSync(file, "utf8");
+    const h1s = html.match(/<h1\b/g) || [];
+    assert.strictEqual(h1s.length, 1, `${path.relative(REPO, file)} has ${h1s.length} h1 elements`);
+  }
+});
+
+test("sitemap.xml gives every URL a lastmod", () => {
+  const sitemap = fs.readFileSync(path.join(REPO, "sitemap.xml"), "utf8");
+  const urls = sitemap.match(/<url>[\s\S]*?<\/url>/g) || [];
+  assert.ok(urls.length > 5, "expected a populated sitemap");
+  for (const block of urls) {
+    assert.match(block, /<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/, `no lastmod for ${block.match(/<loc>(.*?)<\/loc>/)[1]}`);
+  }
+});

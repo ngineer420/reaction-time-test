@@ -790,6 +790,11 @@ if (typeof module !== "undefined" && module.exports) {
     earlyClickCount = 0;
     resultsPanel.hidden = true;
     stageControls.hidden = true;
+    // Draw! has just been hidden. If focus stayed on it, the browser would drop
+    // focus to <body> and Space would scroll the page instead of reaching the
+    // stage. Move focus to the stage, which owns the in-round key handler. This
+    // runs before the cue is armed, so it is nowhere near the measured interval.
+    focusStage();
     resetPips();
     setLights(0);
     enterFullBleed();
@@ -963,6 +968,12 @@ if (typeof module !== "undefined" && module.exports) {
     }, ROUND_RESULT_DISPLAY_MS);
   }
 
+  /* Focus the stage without scrolling to it. preventScroll is widely supported
+     but not universal, so fall back to a plain focus() call. */
+  function focusStage() {
+    try { stageEl.focus({ preventScroll: true }); } catch (e) { stageEl.focus(); }
+  }
+
   function handleStageActivate() {
     if (state === "waiting") { handleTooSoon(); return; }
     if (state === "nogo") { handleFalseAlarm(); return; }
@@ -980,6 +991,10 @@ if (typeof module !== "undefined" && module.exports) {
     updateRoundLabel(`Round 1 of ${sequence.length}`);
     setStageContentHTML(IDLE_CONTENT_HTML);
     stageControls.hidden = false;
+    // The stage is inert again and Draw! is back, so hand the keyboard to it.
+    if (document.activeElement === stageEl || document.activeElement === cancelBtn) {
+      try { startBtn.focus({ preventScroll: true }); } catch (e) { startBtn.focus(); }
+    }
   }
 
   function finishSession() {
@@ -1353,8 +1368,10 @@ if (typeof module !== "undefined" && module.exports) {
   }
 
   /* ---------- event wiring ---------- */
-  // A single pointerdown listener handles mouse, touch, and pen without double-firing
-  // (pointer events unify these; we deliberately do not also listen for "click").
+  // THE STAGE IS THE MEASUREMENT. One pointerdown listener covers mouse, touch
+  // and pen without double-firing (pointer events unify the three), and it
+  // fires earlier than "click" would. Never add a "click" listener here: it
+  // would score the same response twice and it would score it late.
   stageEl.addEventListener("pointerdown", handleStageActivate);
   stageEl.addEventListener("keydown", (e) => {
     if ((e.key === "Enter" || e.key === " " || e.key === "Spacebar") && !e.repeat) {
@@ -1363,21 +1380,34 @@ if (typeof module !== "undefined" && module.exports) {
     }
   });
 
-  startBtn.addEventListener("pointerdown", (e) => {
+  // The CONTROL buttons are a different case from the stage above. They start,
+  // cancel, repeat and share a test; none of them is inside the interval being
+  // measured, so nothing here needs pointerdown's head start. They listen for
+  // "click", which a mouse, a tap, Space and Enter all produce. pointerdown
+  // does NOT fire for Space or Enter, so a keyboard visitor could not start a
+  // test at all while these were bound to it.
+  startBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     startTest();
   });
   if (cancelBtn) {
+    // The cancel button sits INSIDE #test-stage, and the stage still activates
+    // on pointerdown. Stop the pointer event at the button so a cancel is never
+    // also scored as a click on the stage. This listener only shields; the one
+    // activation path is the "click" listener below, so there is no double fire.
     cancelBtn.addEventListener("pointerdown", (e) => {
+      e.stopPropagation();
+    });
+    cancelBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       cancelTest();
     });
   }
-  retryBtn.addEventListener("pointerdown", (e) => {
+  retryBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     startTest();
   });
-  copyBtn.addEventListener("pointerdown", (e) => {
+  copyBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     copyResult();
   });
