@@ -21,14 +21,13 @@ SITE = "https://reflexzap.com"
 # ---------------------------------------------------------------------------
 # Cross-property footer
 # ---------------------------------------------------------------------------
-# Four peers, not nineteen. A short, categorised list reads as a workshop index;
+# Three peers, not nineteen. A short, categorised list reads as a workshop index;
 # the full portfolio in every footer reads as a link farm. The erabb.it mark is
 # NOT in this list - it stays last in <body>, where it has always been.
 PEERS = [
     ("https://flicktrainer.com", "Flick Trainer", "aim training"),
     ("https://cpsboost.com", "cpsboost", "click speed"),
     ("https://chimpmemory.com", "Chimp Memory", "memory tests"),
-    ("https://hardwarecheckup.com", "Hardware Checkup", "hardware diagnostics"),
 ]
 
 PEERS_START = "<!-- peers:start -->"
