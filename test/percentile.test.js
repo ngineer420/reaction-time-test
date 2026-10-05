@@ -13,9 +13,9 @@ const REPO = path.join(__dirname, "..");
 
 /* Hosts this site LINKS to but never LOADS from. A plain <a href> costs the
    visitor nothing until they click it; a <script>, <link> or <img> is a
-   third-party request on every page view, and those stay banned. The last four
+   third-party request on every page view, and those stay banned. The last three
    are the sibling tools in the footer's related-tools block. */
-const PLAIN_LINKS = /^https?:\/\/(doi\.org|humanbenchmark\.com|erabb\.it|schema\.org|sch3ma\.com|flicktrainer\.com|cpsboost\.com|chimpmemory\.com|hardwarecheckup\.com)/;
+const PLAIN_LINKS = /^https?:\/\/(doi\.org|humanbenchmark\.com|erabb\.it|schema\.org|sch3ma\.com|flicktrainer\.com|cpsboost\.com|chimpmemory\.com)/;
 
 /* A second, deliberately different model: higher-is-better, different units.
    The engine must not assume milliseconds or that low scores win. */
@@ -827,7 +827,7 @@ test("every article carries Article markup and the four Open Graph tags", () => 
 });
 
 test("every page with a footer carries the related-tools block, and the mark stays last", () => {
-  const peers = ["flicktrainer.com", "cpsboost.com", "chimpmemory.com", "hardwarecheckup.com"];
+  const peers = ["flicktrainer.com", "cpsboost.com", "chimpmemory.com"];
   let seen = 0;
   for (const file of PAGES) {
     const html = fs.readFileSync(file, "utf8");
@@ -838,9 +838,9 @@ test("every page with a footer carries the related-tools block, and the mark sta
     for (const peer of peers) {
       assert.match(html, new RegExp(`href="https://${peer.replace(".", "\\.")}" rel="noopener"`), `${rel} is missing ${peer}`);
     }
-    // Four peers, not the whole portfolio - a longer list reads as a link farm.
+    // Three peers, not the whole portfolio - a longer list reads as a link farm.
     const links = html.match(/<div class="footer-peers">[\s\S]*?<\/div>/)[0].match(/<a /g) || [];
-    assert.strictEqual(links.length, 4, `${rel}: the related-tools block must stay at four links`);
+    assert.strictEqual(links.length, 3, `${rel}: the related-tools block must stay at three links`);
     assert.match(html, /erabbit-mark[\s\S]*?<\/a>\s*(<div[\s\S]*?)?<\/body>|erabbit-mark/);
   }
   assert.ok(seen >= 17, `expected every page to have a footer, saw ${seen}`);
